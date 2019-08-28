@@ -1,0 +1,21 @@
+root = true
+
+[*]
+charset = utf-8
+indent_size = 4
+indent_style = space
+insert_final_newline = true
+trim_trailing_whitespace = true
+ij_visual_guides = 80,120
+
+[*.{html,css}]
+indent_size = 2
+max_line_length = off
+
+[*.md]
+trim_trailing_whitespace = false
+
+[Makefile]
+indent_size = unset
+indent_style = tab
+max_line_length = off
