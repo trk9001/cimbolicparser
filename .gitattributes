@@ -1,0 +1,43 @@
+# Default for all files
+* text=auto
+
+# Text files
+.editorconfig text
+.gitignore text
+LICENSE text
+Makefile text
+README text
+*.example text
+*.html text
+*.css text
+*.js text
+*.md text
+*.txt text
+*.csv text
+*.sql text
+*.xml text
+*.yml text
+*.json text
+*.py text
+*.sh text
+*.cmd text
+*.env text
+
+# Binary files
+*.jpeg binary
+*.jpg binary
+*.png binary
+*.svg binary
+*.gif binary
+*.webm binary
+*.mp4 binary
+*.avi binary
+*.mkv binary
+*.pkl binary
+*.pdf binary
+*.xlsx binary
+*.xls binary
+*.doc binary
+*.docx binary
+*.odt binary
+*.odc binary
