@@ -8,11 +8,22 @@ Notes:
     - the expression is denoted by `expr` in the code
 """
 
+import operator as pyop
+
 import pyparsing as pp
+
+
+def operation(op):
+    if op == '+':
+        return pyop.add
+    if op == '-':
+        return pyop.sub
+    return None
+
 
 # define a variable
 variable = pp.Combine(
-    pp.Word('$', exact=1)
+    pp.Suppress('$')
     + pp.Word(pp.alphas + '_', exact=1)
     + pp.Optional(pp.Word(pp.alphanums + '_'))
 )
@@ -21,7 +32,14 @@ variable = pp.Combine(
 integer = pp.Word(pp.nums)
 
 # define an addition operator
-operator = pp.Literal('+') | pp.Literal('-')
+operator = (pp.Literal('+') | pp.Literal('-')).setParseAction(lambda toks: operation(toks[0]))
 
 # define the expression
-expr = variable + '=' + integer + operator + integer
+expr = variable('var') + '=' + integer('int1') + operator('op') + integer('int2')
+
+if __name__ == '__main__':
+    expr.runTests(
+        '''
+        $x = 42 + 69
+        '''
+    )
