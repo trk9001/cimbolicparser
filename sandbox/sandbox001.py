@@ -1,6 +1,7 @@
 """Experiment 001.
 
-Goal: parse an expression of the form `$VAR = 42 + 69`.
+Goal 1: parse an expression of the form `$VAR = 42 + 69`.
+Goal 2: parse an expression of the form `$VAR = (42 + 69)`.
 Additional: also maybe evaluate it.
 
 Notes:
@@ -29,17 +30,18 @@ variable = pp.Combine(
 )
 
 # define an integer
-integer = pp.Word(pp.nums)
+integer = pp.Word(pp.nums).setParseAction(lambda toks: int(toks[0]))
 
 # define an addition operator
 operator = (pp.Literal('+') | pp.Literal('-')).setParseAction(lambda toks: operation(toks[0]))
 
 # define the expression
-expr = variable('var') + '=' + integer('int1') + operator('op') + integer('int2')
+expr = variable('var') + '=' + pp.Optional(pp.Literal('(')) + integer('int1') + operator('op') + integer('int2') + pp.Optional(pp.Literal(')'))
 
 if __name__ == '__main__':
     expr.runTests(
         '''
         $x = 42 + 69
+        $y = (420 + 786)
         '''
     )
