@@ -1,12 +1,12 @@
 """Experiment 001.
 
-Goal 1: parse an expression of the form `$VAR = 42 + 69`.
-Goal 2: parse an expression of the form `$VAR = (42 + 69)`.
+Goal 1: parse an equation of the form `$VAR = 42 + 69`.
+Goal 2: parse an equation of the form `$VAR = (42 + 69)`.
 Additional: also maybe evaluate it.
 
 Notes:
     - variables start with a '$'
-    - the expression is denoted by `expr` in the code
+    - the equation is denoted by `expr` in the code
 """
 
 import operator as pyop
@@ -36,10 +36,10 @@ integer = pp.Word(pp.nums).setParseAction(lambda toks: int(toks[0]))
 operator = (pp.Literal('+') | pp.Literal('-')).setParseAction(lambda toks: operation(toks[0]))
 
 # define the expression
-expr = variable('var') + '=' + pp.Optional(pp.Literal('(')) + integer('int1') + operator('op') + integer('int2') + pp.Optional(pp.Literal(')'))
+equ = variable('var') + '=' + pp.Optional(pp.Literal('(')) + integer('int1') + operator('op') + integer('int2') + pp.Optional(pp.Literal(')'))
 
 if __name__ == '__main__':
-    expr.runTests(
+    equ.runTests(
         '''
         $x = 42 + 69
         $y = (420 + 786)
