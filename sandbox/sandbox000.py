@@ -17,3 +17,12 @@ real_number_type_2 = pp.Combine(pp.Optional(pp.Word(pp.nums)) + '.' + pp.Word(pp
 real_number = real_number_type_1 | real_number_type_2
 real_number.setParseAction(lambda toks: to_int_or_decimal(toks[0]))
 # ---
+
+
+# Named variable --------------------------------------------------------------
+named_variable = pp.Combine(
+    pp.Suppress('$')
+    + pp.Word(pp.alphas + '_', exact=1)
+    + pp.Optional(pp.Word(pp.alphanums + '_'))
+)
+# ---
