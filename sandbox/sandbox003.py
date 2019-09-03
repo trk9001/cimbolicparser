@@ -23,6 +23,8 @@ def get_arithmetic_operation(op: str) -> Optional[Callable]:
         return operator.mul
     if op == '/':
         return operator.truediv
+    if op == 'mod':
+        return operator.mod
     if op == '^':
         return operator.pow
     return None
@@ -34,7 +36,7 @@ real_number = (pp.Combine(pp.Word(pp.nums) + pp.Optional('.' + pp.Word(pp.nums))
 real_number.setParseAction(lambda toks: convert_to_int_or_Decimal(toks[0]))
 
 # parse a binary arithmetic operator
-binary_arithmetic_operator_in_term = pp.oneOf('^ * /')
+binary_arithmetic_operator_in_term = pp.oneOf('^ * / mod')
 binary_arithmetic_operator_in_term.setParseAction(lambda toks: get_arithmetic_operation(toks[0]))
 binary_arithmetic_operator_not_in_term = pp.oneOf('+ -')
 binary_arithmetic_operator_not_in_term.setParseAction(lambda toks: get_arithmetic_operation(toks[0]))
@@ -73,5 +75,7 @@ if __name__ == '__main__':
         (42 + 69) * (420 + 500)
         ((42 + 69) * 420) + 500
         42 + 69 * (420 + 500)
+        4 mod 4
+        (4 + 5) mod 4 mod 4
         '''
     )
