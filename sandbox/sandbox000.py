@@ -1,7 +1,7 @@
 """The culmination of experiment results."""
 
 from decimal import Decimal
-from typing import Callable, Optional, Union
+from typing import Union
 
 import pyparsing as pp
 
@@ -12,8 +12,8 @@ def to_int_or_decimal(number: str) -> Union[int, Decimal]:
     return Decimal(number) if '.' in number else int(number)
 
 
-real_number_type_1 = pp.Combine(pp.Word(pp.nums) + pp.Optional('.' + pp.Word(pp.nums)))  # 1, 1.23
-real_number_type_2 = pp.Combine(pp.Optional(pp.Word(pp.nums)) + '.' + pp.Word(pp.nums))  # .1, 2.1
+real_number_type_1 = pp.Combine(pp.Word(pp.nums) + pp.Optional('.' + pp.Word(pp.nums)))
+real_number_type_2 = pp.Combine(pp.Optional(pp.Word(pp.nums)) + '.' + pp.Word(pp.nums))
 real_number = pp.Combine(pp.Optional(pp.oneOf('+ -')) + (real_number_type_1 | real_number_type_2))
 real_number.setParseAction(lambda toks: to_int_or_decimal(toks[0]))
 # ---
@@ -25,6 +25,28 @@ named_variable = pp.Combine(
     pp.Suppress('$')
     + pp.Word(pp.alphas + '_', exact=1)
     + pp.Optional(pp.Word(pp.alphanums + '_'))
+)
+# ---
+
+
+# Arithmetic operator ---------------------------------------------------------
+multiplicative_arithmetic_operator = pp.oneOf('^ * / mod')
+multiplicative_arithmetic_operator.setParseAction(lambda toks: '%' if toks[0] == 'mod' else toks[0])
+additive_arithmetic_operator = pp.oneOf('+ -')
+# ---
+
+
+# Arithmetic expression -------------------------------------------------------
+expression = pp.Forward()
+term = ((real_number | named_variable | expression)
+        + pp.ZeroOrMore(multiplicative_arithmetic_operator
+                        + (real_number | named_variable | expression)))
+expression <<= (
+        (
+            '(' + term + pp.ZeroOrMore(additive_arithmetic_operator + term) + ')'
+            + pp.ZeroOrMore((multiplicative_arithmetic_operator + expression) | (additive_arithmetic_operator + term))
+        )
+        | (term + pp.ZeroOrMore(additive_arithmetic_operator + term))
 )
 # ---
 
