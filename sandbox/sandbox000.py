@@ -20,6 +20,7 @@ real_number.setParseAction(lambda toks: to_int_or_decimal(toks[0]))
 
 
 # Named variable --------------------------------------------------------------
+# Note: This needs a ParseAction for conversion to a numeric value.
 named_variable = pp.Combine(
     pp.Suppress('$')
     + pp.Word(pp.alphas + '_', exact=1)
