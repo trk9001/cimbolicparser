@@ -22,6 +22,14 @@ real_number.setParseAction(lambda toks: Decimal(toks[0]) if '.' in toks[0] else 
 # ---
 
 
+# Quoted string grammar -------------------------------------------------------
+allowed_chars_in_string = list(pp.printables)
+allowed_chars_in_string.remove('"')
+allowed_chars_in_string.append(' ')
+quoted_string = pp.Combine('"' + pp.Word(''.join(allowed_chars_in_string)) + '"')
+# ---
+
+
 # Named variable grammar ------------------------------------------------------
 # TODO: Add a ParseAction for conversion to a numerical value
 named_variable = pp.Combine(
