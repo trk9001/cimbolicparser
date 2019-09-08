@@ -50,7 +50,7 @@ condition = (
 conditional_expression = pp.Forward()
 conditional_expression <<= (
     ('(' + logical_negation_operator + conditional_expression + ')')
-    | ('(' + condition + pp.ZeroOrMore(logical_combination_operator + conditional_expression) + ')')
+    | ('(' + conditional_expression + ')')
     | (logical_negation_operator + conditional_expression)
     | (condition + pp.ZeroOrMore(logical_combination_operator + conditional_expression))
 ) + pp.ZeroOrMore(logical_combination_operator + conditional_expression)
@@ -77,5 +77,6 @@ conditional_expression.runTests(
     # to fail:
     
     42
+    (((42 != 69) and not (42<3)) or (23<4))
     '''
 )
