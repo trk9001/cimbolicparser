@@ -13,7 +13,7 @@ def print_toks(toks):
 
 
 def iter_value():
-    var_values = [0.1, 2.0, 42, 69, 420, 500, 0.1, 2.0, 42, 69, 420, 500]
+    var_values = [0.1, 2.0, 42, 69, 420, 500, 0.1, 2.0, 42, 69, 420, 500, 42, 69, 420, 500]
     for val in var_values:
         yield val
 
@@ -29,10 +29,10 @@ conditional_operator_equality = pp.oneOf('== !=')
 conditional_operator_inequality = pp.oneOf('< > <= >=')
 conditional_operator_all = conditional_operator_equality | conditional_operator_inequality
 
-logical_combination_operator = pp.oneOf('and or')
-logical_negation_operator = pp.Literal('not')
+logical_combination_operator = pp.Keyword('and') | pp.Keyword('or')
+logical_negation_operator = pp.Keyword('not')
 
-boolean_value = pp.oneOf('true false')
+boolean_value = pp.oneOf('true false').setParseAction(lambda toks: True if toks[0] == 'true' else False)
 null = pp.Literal('null').setParseAction(lambda toks: None)
 
 conditional_term = arithmetic_expression
@@ -64,6 +64,8 @@ condition.runTests(
     (($x + 69) < 420)
     (($x + 69) == ($y + 3 -2))
     (max($x, 34, $y+3, (3/$g)) < min(23, 45))
+    3 < $gmod3
+    3 < $g%3
     
     # to fail:
     
