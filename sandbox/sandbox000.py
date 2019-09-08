@@ -33,8 +33,7 @@ named_variable = pp.Combine(
 
 
 # Arithmetic operator grammar -------------------------------------------------
-multiplicative_arithmetic_operator = pp.oneOf('^ * / mod')
-multiplicative_arithmetic_operator.setParseAction(lambda toks: '%' if toks[0] == 'mod' else toks[0])
+multiplicative_arithmetic_operator = pp.oneOf('^ * / %')
 additive_arithmetic_operator = pp.oneOf('+ -')
 # ---
 
