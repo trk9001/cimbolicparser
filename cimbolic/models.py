@@ -1,4 +1,4 @@
-from django.core.validators import RegexValidator
+from django.core.validators import MinValueValidator, RegexValidator
 from django.db import models
 
 
@@ -22,16 +22,6 @@ class Variable(models.Model):
         help_text='Whether the variable is system defined or user-created',
         choices=TYPE_CHOICES,
         max_length=3,
-    )
-    created_at = models.DateTimeField(
-        help_text='Date-time of creation',
-        auto_now_add=True,
-        editable=False,
-    )
-    last_modified_at = models.DateTimeField(
-        help_text='Date-time of last modification',
-        auto_now=True,
-        editable=False,
     )
     source_model = models.CharField(
         help_text='The model to which this variable belongs (eg: payroll.Component)',
@@ -63,3 +53,22 @@ class Formula(models.Model):
     rule = models.TextField(
         help_text='Cimbolic arithmetic rule to be set',
     )
+    priority = models.PositiveIntegerField(
+        help_text='Set the ordering of condition-checking (1 is highest)',
+        validators=[
+            MinValueValidator(1),
+        ],
+    )
+    is_active = models.BooleanField(
+        help_text='Whether the formula is currently active',
+        default=True,
+    )
+
+    class Meta:
+        constraints = [
+            models.UniqueConstraint(
+                fields=['variable', 'priority'],
+                name='unique_formula_priority_per_variable',
+            ),
+        ]
+        verbose_name_plural = 'formulae'
