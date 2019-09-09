@@ -1,3 +1,6 @@
+from decimal import Decimal
+from typing import Iterable, Union
+
 from django.core.validators import MinValueValidator, RegexValidator
 from django.db import models
 
@@ -39,6 +42,19 @@ class Variable(models.Model):
 
     def __str__(self):
         return f'{self.name}'
+
+    def prioritized_formulae(self) -> Iterable:
+        """Return a queryset of the relevant formulae sorted by priority."""
+        formulae = self.formulae.order_by('priority')
+        return formulae
+
+    def to_value(self) -> Union[str, int, Decimal]:
+        """Parse the variable's formulae and return a value."""
+        for formula in self.prioritized_formulae():
+            if formula.condition_to_boolean():
+                result = formula.rule_to_value()
+                return result
+        # TODO: blah
 
 
 class Formula(models.Model):
@@ -104,3 +120,11 @@ class Formula(models.Model):
 
     def __str__(self):
         return f'{self.variable} > priority {self.priority}'
+
+    def condition_to_boolean(self) -> bool:
+        """Parse the condition and return a boolean result."""
+        pass
+
+    def rule_to_value(self) -> Union[str, int, Decimal]:
+        """Parse the rule and evaluate it to give a result."""
+        pass
