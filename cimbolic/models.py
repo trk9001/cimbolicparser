@@ -37,6 +37,9 @@ class Variable(models.Model):
         default=True,
     )
 
+    def __str__(self):
+        return f'{self.name}'
+
 
 class Formula(models.Model):
     """Model representing a condition-rule pair associated with a named variable."""
@@ -73,3 +76,6 @@ class Formula(models.Model):
             ),
         ]
         verbose_name_plural = 'formulae'
+
+    def __str__(self):
+        return f'{self.variable} > priority {self.priority}'
