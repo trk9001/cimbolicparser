@@ -81,5 +81,26 @@ class Formula(models.Model):
         ]
         verbose_name_plural = 'formulae'
 
+    def save(self, *args, **kwargs):
+        # Disallow saving if no 'NULL' condition exists
+        siblings = Formula.objects.filter(variable=self.variable)
+        if self.pk is not None:
+            siblings = siblings.exclude(pk=self.pk)
+        if self.condition != 'NULL' and not siblings.filter(condition='NULL').exists():
+            raise Exception  # TODO: blah
+        super().save(*args, **kwargs)
+
+        # Update the priority of the formula with the 'NULL' condition to be
+        # the highest of the same variable's formulae's priorities.
+        family = Formula.objects.filter(variable=self.variable)
+        null_formula = family.get(condition='NULL')
+        non_null_formulae = family.exclude(pk=null_formula.pk)
+        max_priority = non_null_formulae.aggregate(max_p=models.Max('priority')).get('max_p')
+        if null_formula.priority <= max_priority:
+            null_formula.priority = max_priority + 1
+            null_formula.save(update_fields=['priority'])
+
+
+
     def __str__(self):
         return f'{self.variable} > priority {self.priority}'
