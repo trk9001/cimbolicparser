@@ -74,6 +74,10 @@ class Formula(models.Model):
                 fields=['variable', 'priority'],
                 name='unique_formula_priority_per_variable',
             ),
+            models.UniqueConstraint(
+                fields=['variable', 'condition'],
+                name='unique_formula_condition_per_variable',
+            ),
         ]
         verbose_name_plural = 'formulae'
 
