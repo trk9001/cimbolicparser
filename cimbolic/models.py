@@ -12,6 +12,7 @@ class Variable(models.Model):
     name = models.CharField(
         help_text='Name of the variable (eg: BASIC)',
         max_length=80,
+        unique=True,
     )
     description = models.TextField(
         help_text='A brief description of the variable',
