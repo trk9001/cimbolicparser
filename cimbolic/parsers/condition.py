@@ -1,6 +1,6 @@
 import pyparsing as pp
 
-from .rule_parser import arithmetic_expression
+from .rule import arithmetic_expression
 
 # Quoted string grammar -------------------------------------------------------
 allowed_chars_in_string = list(pp.printables)
@@ -49,5 +49,5 @@ conditional_expression <<= (
 # ---
 
 
-class ConditionParser():
+class ConditionParser:
     pass

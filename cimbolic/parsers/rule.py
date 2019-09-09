@@ -94,5 +94,5 @@ arithmetic_expression <<= (
 # ---
 
 
-class RuleParser():
+class RuleParser:
     pass
