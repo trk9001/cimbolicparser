@@ -116,8 +116,6 @@ class Formula(models.Model):
             null_formula.priority = max_priority + 1
             null_formula.save(update_fields=['priority'])
 
-
-
     def __str__(self):
         return f'{self.variable} > priority {self.priority}'
 
