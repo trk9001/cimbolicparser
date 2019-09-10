@@ -5,6 +5,7 @@ from django.core.validators import MinValueValidator, RegexValidator
 from django.db import models
 
 from .exceptions import VariableNotDefinedError
+from .parsers import evaluate_rule
 from .utils import get_system_defined_variables
 
 
@@ -150,4 +151,5 @@ class Formula(models.Model):
 
     def rule_to_value(self) -> Union[str, int, Decimal]:
         """Parse the rule and evaluate it to give a result."""
-        pass
+        result = evaluate_rule(self.rule)
+        return result

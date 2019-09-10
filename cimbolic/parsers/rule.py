@@ -107,5 +107,7 @@ arithmetic_expression <<= (
 # ---
 
 
-class RuleParser:
-    pass
+def evaluate_rule(rule: str) -> Union[int, Decimal]:
+    """Parse the input string and return a corresponding value."""
+    result = evaluator(arithmetic_expression.parseString(rule))
+    return result
