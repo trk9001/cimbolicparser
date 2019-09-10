@@ -5,7 +5,7 @@ from django.core.validators import MinValueValidator, RegexValidator
 from django.db import models
 
 from .exceptions import DefaultFormulaMissingError, VariableNotDefinedError
-from .parsers import evaluate_rule
+from .parsers import evaluate_condition, evaluate_rule
 from .utils import get_system_defined_variables
 
 
@@ -152,7 +152,8 @@ class Formula(models.Model):
 
     def condition_to_boolean(self) -> bool:
         """Parse the condition and return a boolean result."""
-        pass
+        result = evaluate_condition(self.condition)
+        return result
 
     def rule_to_value(self) -> Union[str, int, Decimal]:
         """Parse the rule and evaluate it to give a result."""

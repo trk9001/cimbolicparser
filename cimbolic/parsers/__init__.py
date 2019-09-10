@@ -1,2 +1,2 @@
 from .rule import evaluate_rule
-from .condition import ConditionParser
+from .condition import evaluate_condition
