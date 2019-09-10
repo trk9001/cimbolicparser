@@ -74,7 +74,10 @@ class Formula(models.Model):
         help_text='Cimbolic arithmetic rule to be set',
     )
     priority = models.PositiveIntegerField(
-        help_text='Set the ordering of condition-checking (1 is highest)',
+        help_text=(
+            'Set the ordering of condition-checking (1 is highest) '
+            '(Note: the priority of a \'NULL\' condition will automatically be set to be the lowest)'
+        ),
         validators=[
             MinValueValidator(1),
         ],
