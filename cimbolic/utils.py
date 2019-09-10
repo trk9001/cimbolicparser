@@ -1,8 +1,10 @@
 import importlib.util
 import os.path
-from typing import Dict
+from typing import Dict, Tuple, Union
 
 from django.conf import settings
+
+from .models import Variable, Formula
 
 SYSTEM_DEFINED_VARIABLE_FILE_NAME = 'cimbolicsysvars.py'
 
@@ -15,3 +17,28 @@ def get_system_defined_variables() -> Dict:
     module = importlib.util.module_from_spec(spec)
     spec.loader.exec_module(module)
     return module.system_defined_variables
+
+
+def clean_variable_name(var: str) -> str:
+    """Clean a variable name."""
+    return var.lstrip('$')
+
+
+def variable_exists(var: str) -> bool:
+    """Check whether a variable of the given name exists."""
+    pass
+
+
+def create_variable(var: str) -> Variable:
+    """Create a user-defined variable with the given name."""
+    pass
+
+
+def attach_formula_to_variable(var: Union[str, Variable], formula: Tuple[str, str], priority: int) -> Formula:
+    """Create and attach a formula to the given variable."""
+    pass
+
+
+# TODO: Complete interfaces for variable creation.
+# TODO: Create interfaces for variable maintenance and deletion.
+# TODO: Add the interfaces to __init__.py
