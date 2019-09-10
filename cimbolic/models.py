@@ -48,7 +48,7 @@ class Variable(models.Model):
     )
 
     def __str__(self):
-        return f'{self.name}'
+        return f'${self.name}'
 
     def prioritized_formulae(self) -> Union[Iterable, models.query.QuerySet]:
         """Return a queryset of the relevant formulae sorted by priority."""
