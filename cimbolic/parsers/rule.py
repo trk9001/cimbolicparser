@@ -1,8 +1,10 @@
 from decimal import Decimal
-from typing import Iterable, Union
+from typing import Union
 
 import pyparsing as pp
 
+from ..exceptions import VariableNotFoundError
+from ..models import Variable
 from .utils import evaluator
 
 
@@ -15,12 +17,23 @@ real_number.setParseAction(lambda toks: Decimal(toks[0]) if '.' in toks[0] else 
 
 
 # Named variable grammar ------------------------------------------------------
-# TODO: Add a ParseAction for conversion to a numerical value
+def to_value(toks: pp.ParseResults) -> Union[int, Decimal]:
+    """Fetch the variable from the database and return its value."""
+    var_name = toks[0]
+    try:
+        var = Variable.objects.get(name=var_name)
+    except Variable.DoesNotExist:
+        raise VariableNotFoundError(f'Variable {var_name} not found in the database')
+    else:
+        return var.to_value()
+
+
 named_variable = pp.Combine(
     pp.Suppress('$')
     + pp.Word(pp.alphas + '_', exact=1)
     + pp.Optional(pp.Word(pp.alphanums + '_'))
 )
+named_variable.setParseAction(to_value)
 # ---
 
 
@@ -39,7 +52,7 @@ arithmetic_expression = pp.Forward()
 aggregate_macro_names_allowed = 'max min'
 
 
-def aggregate_macro_evaluator(toks: Iterable) -> Union[int, Decimal]:
+def aggregate_macro_evaluator(toks: pp.ParseResults) -> Union[int, Decimal]:
     """Recursively evaluate the arguments to an aggregate macro."""
     macro_name, macro_args = tuple(toks)
     sub_expression = ''
@@ -61,7 +74,7 @@ aggregate_macro = (
     + pp.Group(arithmetic_expression + pp.ZeroOrMore(pp.Literal(',') + arithmetic_expression))
     + pp.Suppress(')')
 )
-aggregate_macro.setParseAction(lambda toks: aggregate_macro_evaluator(toks))
+aggregate_macro.setParseAction(aggregate_macro_evaluator)
 # ---
 
 
