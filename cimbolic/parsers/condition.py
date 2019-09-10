@@ -50,10 +50,10 @@ conditional_expression <<= (
 # ---
 
 
-def evaluate_condition(condition: str) -> bool:
+def evaluate_condition(condition_: str) -> bool:
     """Parse the input condition and return a corresponding boolean value."""
-    if condition.strip().upper() == 'NULL':
+    if condition_.strip().upper() == 'NULL':
         return True
     else:
-        result = evaluator(conditional_expression.parseString(condition))
+        result = evaluator(conditional_expression.parseString(condition_))
         return result
