@@ -4,7 +4,7 @@ from typing import Iterable, Union
 from django.core.validators import MinValueValidator, RegexValidator
 from django.db import models
 
-from .exceptions import VariableNotDefinedError
+from .exceptions import DefaultFormulaMissingError, VariableNotDefinedError
 from .parsers import evaluate_rule
 from .utils import get_system_defined_variables
 
@@ -128,16 +128,18 @@ class Formula(models.Model):
 
     def save(self, *args, **kwargs):
         # Disallow saving if no 'NULL' condition exists
-        siblings = Formula.objects.filter(variable=self.variable)
+        siblings = Formula.objects.filter(variable=self.variable, is_active=True)
         if self.pk is not None:
             siblings = siblings.exclude(pk=self.pk)
         if self.condition != 'NULL' and not siblings.filter(condition='NULL').exists():
-            raise Exception  # TODO: blah
+            raise DefaultFormulaMissingError(
+                f'Default formula (with a \'NULL\' condition) is missing for variable {self.variable}'
+            )
         super().save(*args, **kwargs)
 
         # Update the priority of the formula with the 'NULL' condition to be
         # the highest of the same variable's formulae's priorities.
-        family = Formula.objects.filter(variable=self.variable)
+        family = Formula.objects.filter(variable=self.variable, is_active=True)
         null_formula = family.get(condition='NULL')
         non_null_formulae = family.exclude(pk=null_formula.pk)
         max_priority = non_null_formulae.aggregate(max_p=models.Max('priority')).get('max_p')
