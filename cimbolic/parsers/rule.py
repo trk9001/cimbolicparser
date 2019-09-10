@@ -3,7 +3,7 @@ from typing import Iterable, Union
 
 import pyparsing as pp
 
-from .core import evaluator
+from .utils import evaluator
 
 
 # Real number grammar ---------------------------------------------------------
