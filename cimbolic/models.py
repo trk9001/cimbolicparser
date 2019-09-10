@@ -11,9 +11,12 @@ from .utils import get_system_defined_variables
 
 class Variable(models.Model):
     """Model representing metadata of a named variable."""
+    SYSTEM_DEFINED = 'sys'
+    USER_DEFINED = 'usr'
+
     TYPE_CHOICES = [
-        ('sys', 'system-defined'),
-        ('usr', 'user-defined'),
+        (SYSTEM_DEFINED, 'system-defined'),
+        (USER_DEFINED, 'user-defined'),
     ]
 
     name = models.CharField(
@@ -49,12 +52,12 @@ class Variable(models.Model):
 
     def prioritized_formulae(self) -> Union[Iterable, models.query.QuerySet]:
         """Return a queryset of the relevant formulae sorted by priority."""
-        formulae = self.formulae.order_by('priority')
+        formulae = self.formulae.filter(is_active=True).order_by('priority')
         return formulae
 
     def to_value(self, **kwargs) -> Union[str, int, Decimal]:
         """Parse the variable's formulae and return a value."""
-        if self.type == 'sys':
+        if self.type == self.SYSTEM_DEFINED:
             sys_vars = get_system_defined_variables()
             if self.name not in sys_vars.keys():
                 raise VariableNotDefinedError(f'System variable {self.name} undefined')
@@ -70,7 +73,7 @@ class Variable(models.Model):
             else:
                 return result
 
-        if self.type == 'usr':
+        if self.type == self.USER_DEFINED:
             prioritized_formulae = self.prioritized_formulae()
             if not prioritized_formulae.exists():
                 raise VariableNotDefinedError(f'No formula defined for variable {self.name}')
