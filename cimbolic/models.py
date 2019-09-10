@@ -4,6 +4,9 @@ from typing import Iterable, Union
 from django.core.validators import MinValueValidator, RegexValidator
 from django.db import models
 
+from .exceptions import VariableNotDefinedError
+from .utils import get_system_defined_variables
+
 
 class Variable(models.Model):
     """Model representing metadata of a named variable."""
@@ -48,11 +51,22 @@ class Variable(models.Model):
         formulae = self.formulae.order_by('priority')
         return formulae
 
-    def to_value(self) -> Union[str, int, Decimal]:
+    def to_value(self, **kwargs) -> Union[str, int, Decimal]:
         """Parse the variable's formulae and return a value."""
-        for formula in self.prioritized_formulae():
-            if formula.condition_to_boolean():
-                result = formula.rule_to_value()
+        if self.type == 'sys':
+            sys_vars = get_system_defined_variables()
+            if self.name not in sys_vars.keys():
+                raise VariableNotDefinedError('System variable undefined')
+            result, result_args = sys_vars[self.name]
+            if callable(result):
+                result_kwargs = {}
+                for key in result_args:
+                    if key in kwargs.keys():
+                        result_kwargs[key] = kwargs[key]
+                    else:
+                        raise KeyError(f'Missing argument {key} to callable {result.__name__}()')
+                return result(**result_kwargs)
+            else:
                 return result
         # TODO: blah
 
