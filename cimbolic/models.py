@@ -46,7 +46,7 @@ class Variable(models.Model):
     def __str__(self):
         return f'{self.name}'
 
-    def prioritized_formulae(self) -> Iterable:
+    def prioritized_formulae(self) -> Union[Iterable, models.query.QuerySet]:
         """Return a queryset of the relevant formulae sorted by priority."""
         formulae = self.formulae.order_by('priority')
         return formulae
@@ -56,7 +56,7 @@ class Variable(models.Model):
         if self.type == 'sys':
             sys_vars = get_system_defined_variables()
             if self.name not in sys_vars.keys():
-                raise VariableNotDefinedError('System variable undefined')
+                raise VariableNotDefinedError(f'System variable {self.name} undefined')
             result, result_args = sys_vars[self.name]
             if callable(result):
                 result_kwargs = {}
@@ -68,7 +68,15 @@ class Variable(models.Model):
                 return result(**result_kwargs)
             else:
                 return result
-        # TODO: blah
+
+        if self.type == 'usr':
+            prioritized_formulae = self.prioritized_formulae()
+            if not prioritized_formulae.exists():
+                raise VariableNotDefinedError(f'No formula defined for variable {self.name}')
+            for formula in prioritized_formulae:
+                if formula.condition_to_boolean():
+                    result = formula.rule_to_value()
+                    return result
 
 
 class Formula(models.Model):
