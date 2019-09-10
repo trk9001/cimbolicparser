@@ -93,7 +93,6 @@ arithmetic_term = (
 
 
 # Arithmetic expression grammar -------------------------------------------------------
-# TODO: Add rigorous testing
 arithmetic_expression <<= (
     (
         '(' + arithmetic_term + pp.ZeroOrMore(additive_arithmetic_operator + arithmetic_term) + ')'
