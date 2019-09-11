@@ -37,9 +37,17 @@ def variable_exists(var: str) -> bool:
         return True
 
 
-def create_variable(var: str) -> 'Variable':
+def create_variable(name: str, source_model: str, description: str = '',
+                    type: str = Variable.USER_DEFINED, is_active: bool = True) -> 'Variable':
     """Create a user-defined variable with the given name."""
-    pass
+    var = Variable.objects.create(
+        name=name,
+        source_model=source_model,
+        description=description,
+        type=type,
+        is_active=is_active
+    )
+    return var
 
 
 def attach_formula_to_variable(var: Union[str, 'Variable'], formula: Tuple[str, str], priority: int) -> 'Formula':
