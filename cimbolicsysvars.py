@@ -8,7 +8,7 @@ IS SHOWN HERE.
 While the keys of the dictionary are the variables' names, the value is a tuple
 whose first item is the action (value or callable) that results in a value
 being substituted for the variable, and whose second item is a list of argument
-names (as strings) that a callable may take. The latter can be empty.
+names (as strings) that a callable may take. The latter can be an empty list.
 """
 
 
@@ -19,5 +19,5 @@ def dummy_function(arg=None, another_arg=None):
 
 system_defined_variables = {
     'DUMMY_VAR': (dummy_function, ['arg', 'another_arg']),
-    'DUMMY_VAL': (420, ),
+    'DUMMY_VAL': (420, []),
 }
