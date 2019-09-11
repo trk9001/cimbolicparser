@@ -61,5 +61,16 @@ def attach_formula_to_variable(variable: Union[str, Variable], formula: Tuple[st
     return formula
 
 
+def delete_variable(variable: Union[str, Variable], mark_inactive_only: bool = False) -> str:
+    """Delete/deactivate a variable and return its name."""
+    variable = _clean_to_variable(variable)
+    if mark_inactive_only:
+        variable.is_active = False
+        variable.save(update_fields=['is_active'])
+    else:
+        variable.delete()
+    return variable.name
+
+
 # TODO: Create interfaces for variable maintenance and deletion.
 # TODO: Add the interfaces to __init__.py
