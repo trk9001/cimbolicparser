@@ -81,6 +81,37 @@ def update_variable(variable: Union[str, Variable], data: Dict[str, Any]) -> Tup
     return variable, updated_fields
 
 
+def update_formula_of_variable(data: Dict[str, Any], variable: Union[str, Variable] = None, formula: Formula = None,
+                               condition: str = None, priority: int = None) -> Tuple[Formula, List[str]]:
+    """Update a formula attached to the given variable, using the data dictionary."""
+    arguments_valid = True
+    if formula is None:
+        if variable is not None:
+            variable = _clean_to_variable(variable)
+            if condition is not None:
+                formula = variable.formulae.get(condition=condition)
+            elif priority is not None:
+                formula = variable.formulae.get(priority=priority)
+            else:
+                arguments_valid = False
+        else:
+            arguments_valid = False
+    if not arguments_valid:
+        raise TypeError('Arguments should be one or: formula or (variable and (condition or priority))')
+
+    updated_fields = []
+    for key in data:
+        try:
+            formula._meta.get_field(key)
+        except FieldDoesNotExist:
+            pass
+        else:
+            setattr(formula, key, data[key])
+            updated_fields.append(key)
+    formula.save(update_fields=updated_fields)
+    return formula, updated_fields
+
+
 def delete_variable(variable: Union[str, Variable], mark_inactive_only: bool = False) -> str:
     """Delete/deactivate a variable and return its name."""
     variable = _clean_to_variable(variable)
