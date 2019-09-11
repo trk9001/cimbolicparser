@@ -131,5 +131,12 @@ def delete_variable(variable: Union[str, Variable], mark_inactive_only: bool = F
     return variable.name
 
 
-# TODO: Create interfaces for variable maintenance and deletion.
+def delete_formula_of_variable(variable: Union[str, Variable] = None, formula: Formula = None,
+                               condition: str = None, priority: int = None) -> Tuple[str, str, int]:
+    """Delete the specified formula and return it's attributes."""
+    formula = _clean_to_formula(variable, formula, condition, priority)
+    formula.delete()
+    return formula.condition, formula.rule, formula.priority
+
+
 # TODO: Add the interfaces to __init__.py
