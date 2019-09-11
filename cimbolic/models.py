@@ -1,5 +1,5 @@
 from decimal import Decimal
-from typing import Iterable, Union
+from typing import Any, Dict, Iterable, Union
 
 from django.core.validators import MinValueValidator, RegexValidator
 from django.db import models
@@ -55,7 +55,7 @@ class Variable(models.Model):
         formulae = self.formulae.order_by('priority')
         return formulae
 
-    def to_value(self, **kwargs) -> Union[str, int, Decimal]:
+    def to_value(self, context: Dict[str, Any] = None) -> Union[int, Decimal]:
         """Parse the variable's formulae and return a value."""
         if self.type == self.SYSTEM_DEFINED:
             sys_vars = get_system_defined_variables()
@@ -65,8 +65,8 @@ class Variable(models.Model):
             if callable(result):
                 result_kwargs = {}
                 for key in result_args:
-                    if key in kwargs.keys():
-                        result_kwargs[key] = kwargs[key]
+                    if key in context.keys():
+                        result_kwargs[key] = context[key]
                     else:
                         raise KeyError(f'Missing argument {key} to callable {result.__name__}()')
                 return result(**result_kwargs)

@@ -1,3 +1,4 @@
+from decimal import Decimal
 from typing import Any, Dict, List, Tuple, Union
 
 from django.core.exceptions import FieldDoesNotExist
@@ -84,6 +85,13 @@ def create_formula_of_variable(variable: Union[str, Variable], formula: Union[Fo
     else:
         variable.formulae.add(formula)
     return formula
+
+
+def read_variable(variable: Union[str, Variable], context: Dict[str, Any] = None) -> Union[int, Decimal]:
+    """Fetch a variable's value from the database and return it."""
+    variable = _clean_to_variable(variable)
+    value = variable.to_value(context)
+    return value
 
 
 def update_variable(variable: Union[str, Variable], data: Dict[str, Any]) -> Tuple[Variable, List[str]]:
