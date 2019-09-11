@@ -12,7 +12,7 @@ Formula = lazy_import.lazy_module('cimbolic.models.Formula')
 
 
 def get_system_defined_variables() -> Dict:
-    """Read the file in which system-defined variables are stored and return """
+    """Read the file in which system-defined variables are stored and return them."""
     file_path = os.path.join(settings.BASE_DIR, SYSTEM_DEFINED_VARIABLE_FILE_NAME)
     module_name = ''.join(SYSTEM_DEFINED_VARIABLE_FILE_NAME.split('.')[:-1])
     spec = importlib.util.spec_from_file_location(module_name, file_path)
