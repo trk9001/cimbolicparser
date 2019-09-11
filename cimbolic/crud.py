@@ -45,7 +45,7 @@ def _clean_to_formula(variable: Union[str, Variable] = None, formula: Formula = 
         return formula
 
 
-def variable_exists(var: str) -> bool:
+def check_variable_exists(var: str) -> bool:
     """Check whether a variable of the given name exists."""
     var = _clean_variable_name(var)
     try:
@@ -69,7 +69,7 @@ def create_variable(name: str, source_model: str, description: str = None,
     return var
 
 
-def attach_formula_to_variable(variable: Union[str, Variable], formula: Union[Formula, Tuple[str, str]],
+def create_formula_of_variable(variable: Union[str, Variable], formula: Union[Formula, Tuple[str, str]],
                                priority: int) -> Formula:
     """Create and attach a formula to the given variable."""
     variable = _clean_to_variable(variable)
