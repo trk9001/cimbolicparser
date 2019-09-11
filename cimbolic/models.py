@@ -52,7 +52,7 @@ class Variable(models.Model):
 
     def prioritized_formulae(self) -> Union[Iterable, models.query.QuerySet]:
         """Return a queryset of the relevant formulae sorted by priority."""
-        formulae = self.formulae.filter(is_active=True).order_by('priority')
+        formulae = self.formulae.order_by('priority')
         return formulae
 
     def to_value(self, **kwargs) -> Union[str, int, Decimal]:
@@ -108,10 +108,6 @@ class Formula(models.Model):
             MinValueValidator(1),
         ],
     )
-    is_active = models.BooleanField(
-        help_text='Whether the formula is currently active',
-        default=True,
-    )
 
     class Meta:
         constraints = [
@@ -128,7 +124,7 @@ class Formula(models.Model):
 
     def save(self, *args, **kwargs):
         # Disallow saving if no 'NULL' condition exists
-        siblings = Formula.objects.filter(variable=self.variable, is_active=True)
+        siblings = Formula.objects.filter(variable=self.variable)
         if self.pk is not None:
             siblings = siblings.exclude(pk=self.pk)
         if self.condition != 'NULL' and not siblings.filter(condition='NULL').exists():
@@ -139,7 +135,7 @@ class Formula(models.Model):
 
         # Update the priority of the formula with the 'NULL' condition to be
         # the highest of the same variable's formulae's priorities.
-        family = Formula.objects.filter(variable=self.variable, is_active=True)
+        family = Formula.objects.filter(variable=self.variable)
         null_formula = family.get(condition='NULL')
         non_null_formulae = family.exclude(pk=null_formula.pk)
         max_priority = non_null_formulae.aggregate(max_p=models.Max('priority')).get('max_p')
