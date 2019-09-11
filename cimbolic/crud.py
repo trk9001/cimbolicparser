@@ -40,7 +40,7 @@ def _clean_to_formula(variable: Union[str, Variable] = None, formula: Formula = 
         else:
             arguments_valid = False
     if not arguments_valid:
-        raise TypeError('Arguments should be one or: formula or (variable and (condition or priority))')
+        raise TypeError('Arguments required to identify a Formula: Formula or (variable and (condition or priority))')
     else:
         return formula
 
