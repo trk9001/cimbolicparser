@@ -24,6 +24,27 @@ def _clean_to_variable(var: Union[str, Variable]) -> Variable:
     return variable
 
 
+def _clean_to_formula(variable: Union[str, Variable] = None, formula: Formula = None,
+                      condition: str = None, priority: int = None) -> Formula:
+    """Get the referenced Formula and return it."""
+    arguments_valid = True
+    if formula is None:
+        if variable is not None:
+            variable = _clean_to_variable(variable)
+            if condition is not None:
+                formula = variable.formulae.get(condition=condition)
+            elif priority is not None:
+                formula = variable.formulae.get(priority=priority)
+            else:
+                arguments_valid = False
+        else:
+            arguments_valid = False
+    if not arguments_valid:
+        raise TypeError('Arguments should be one or: formula or (variable and (condition or priority))')
+    else:
+        return formula
+
+
 def variable_exists(var: str) -> bool:
     """Check whether a variable of the given name exists."""
     var = _clean_variable_name(var)
@@ -84,20 +105,7 @@ def update_variable(variable: Union[str, Variable], data: Dict[str, Any]) -> Tup
 def update_formula_of_variable(data: Dict[str, Any], variable: Union[str, Variable] = None, formula: Formula = None,
                                condition: str = None, priority: int = None) -> Tuple[Formula, List[str]]:
     """Update a formula attached to the given variable, using the data dictionary."""
-    arguments_valid = True
-    if formula is None:
-        if variable is not None:
-            variable = _clean_to_variable(variable)
-            if condition is not None:
-                formula = variable.formulae.get(condition=condition)
-            elif priority is not None:
-                formula = variable.formulae.get(priority=priority)
-            else:
-                arguments_valid = False
-        else:
-            arguments_valid = False
-    if not arguments_valid:
-        raise TypeError('Arguments should be one or: formula or (variable and (condition or priority))')
+    formula = _clean_to_formula(variable, formula, condition, priority)
 
     updated_fields = []
     for key in data:
