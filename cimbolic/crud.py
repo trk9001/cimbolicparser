@@ -61,7 +61,7 @@ def create_variable(name: str, source_model: str, description: str = None,
                     type: str = Variable.USER_DEFINED, is_active: bool = True) -> Variable:
     """Create a user-defined variable with the given name."""
     var = Variable.objects.create(
-        name=name,
+        name=_clean_variable_name(name),
         source_model=source_model,
         description=description or '',
         type=type,
