@@ -9,6 +9,19 @@ def clean_variable_name(var: str) -> str:
     return var.lstrip('$')
 
 
+def _clean_to_variable(var: Union[str, Variable]) -> Variable:
+    """Get a Variable referenced by a string (or not) and return it."""
+    if isinstance(var, str):
+        var = clean_variable_name(var)
+        try:
+            variable = Variable.objects.get(name=var)
+        except Variable.DoesNotExist:
+            raise VariableNotFoundError(f'Variable ${var} does not exist in the database')
+    else:
+        variable = var
+    return variable
+
+
 def variable_exists(var: str) -> bool:
     """Check whether a variable of the given name exists."""
     var = clean_variable_name(var)
@@ -33,17 +46,10 @@ def create_variable(name: str, source_model: str, description: str = '',
     return var
 
 
-def attach_formula_to_variable(var: Union[str, Variable], formula: Tuple[str, str],
+def attach_formula_to_variable(variable: Union[str, Variable], formula: Tuple[str, str],
                                priority: int, is_active: bool = True) -> Formula:
     """Create and attach a formula to the given variable."""
-    if isinstance(var, str):
-        try:
-            variable = Variable.objects.get(name=clean_variable_name(var))
-        except Variable.DoesNotExist:
-            raise VariableNotFoundError(f'Variable {var} does not exist in the database')
-    else:
-        variable = var
-
+    variable = _clean_to_variable(variable)
     condition, rule = formula
     formula = Formula.objects.create(
         variable=variable,
