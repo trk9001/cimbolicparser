@@ -139,6 +139,7 @@ class Formula(models.Model):
         null_formula = family.get(condition='NULL')
         non_null_formulae = family.exclude(pk=null_formula.pk)
         max_priority = non_null_formulae.aggregate(max_p=models.Max('priority')).get('max_p')
+        max_priority = max_priority or 0
         if null_formula.priority <= max_priority:
             null_formula.priority = max_priority + 1
             null_formula.save(update_fields=['priority'])
