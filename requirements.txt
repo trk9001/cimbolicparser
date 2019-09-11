@@ -1,3 +1,2 @@
 Django==2.2.5
-lazy-import==0.2.2
 pyparsing==2.4.2
