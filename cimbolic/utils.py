@@ -28,7 +28,13 @@ def clean_variable_name(var: str) -> str:
 
 def variable_exists(var: str) -> bool:
     """Check whether a variable of the given name exists."""
-    pass
+    var = clean_variable_name(var)
+    try:
+        Variable.objects.get(name=var)
+    except Variable.DoesNotExist:
+        return False
+    else:
+        return True
 
 
 def create_variable(var: str) -> 'Variable':
