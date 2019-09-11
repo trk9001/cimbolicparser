@@ -16,6 +16,9 @@ setup(
     author_email='imam.hossain@cimplux.com; s.tarik@cimplux.com',
     description='Cimbolic Language & Parser',
     long_description=README,
+    install_requires=[
+        'pyparsing==2.4.2',
+    ],
     classifiers=[
         'Framework :: Django',
         'Framework :: Django :: 2.1',
