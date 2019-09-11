@@ -55,4 +55,5 @@ class Command(BaseCommand):
                 self.stdout.write(self.style.SUCCESS(f'{var}'), ending=', ')
             self.stdout.write(self.style.SUCCESS(f'{vars_marked_inactive[-1]}'))
 
-        return self.style.SUCCESS('Done')
+        if not vars_added and not vars_marked_inactive:
+            return self.style.SUCCESS('Done')
