@@ -46,16 +46,20 @@ def create_variable(name: str, source_model: str, description: str = None,
     return var
 
 
-def attach_formula_to_variable(variable: Union[str, Variable], formula: Tuple[str, str], priority: int) -> Formula:
+def attach_formula_to_variable(variable: Union[str, Variable], formula: Union[Formula, Tuple[str, str]],
+                               priority: int) -> Formula:
     """Create and attach a formula to the given variable."""
     variable = _clean_to_variable(variable)
-    condition, rule = formula
-    formula = Formula.objects.create(
-        variable=variable,
-        condition=condition,
-        rule=rule,
-        priority=priority,
-    )
+    if isinstance(formula, tuple):
+        condition, rule = formula
+        formula = Formula.objects.create(
+            variable=variable,
+            condition=condition,
+            rule=rule,
+            priority=priority,
+        )
+    else:
+        variable.formulae.add(formula)
     return formula
 
 
