@@ -8,7 +8,7 @@ os.chdir(os.path.normpath(os.path.join(os.path.abspath(__file__), os.pardir)))
 
 setup(
     name='Cimbolic',
-    version='1.0.0',
+    version='0.1.0',
     packages=['cimbolic', 'cimbolic.parsers', 'cimbolic.migrations'],
     include_package_data=True,
     url='https://dev.azure.com/Cimplux/CimbolicParser',
