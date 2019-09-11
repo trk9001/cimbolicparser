@@ -1,11 +1,13 @@
 from decimal import Decimal
 from typing import Union
 
+import lazy_import
 import pyparsing as pp
 
 from ..exceptions import VariableNotFoundError
-from ..models import Variable
 from .utils import evaluator
+
+Variable = lazy_import.lazy_module('cimbolic.models.Variable')
 
 
 # Real number grammar ---------------------------------------------------------

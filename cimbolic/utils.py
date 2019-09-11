@@ -2,11 +2,13 @@ import importlib.util
 import os.path
 from typing import Dict, Tuple, Union
 
+import lazy_import
 from django.conf import settings
 
 from . import SYSTEM_DEFINED_VARIABLE_FILE_NAME
 
-SYSTEM_DEFINED_VARIABLE_FILE_NAME = 'cimbolicsysvars.py'
+Variable = lazy_import.lazy_module('cimbolic.models.Variable')
+Formula = lazy_import.lazy_module('cimbolic.models.Formula')
 
 
 def get_system_defined_variables() -> Dict:
@@ -29,12 +31,12 @@ def variable_exists(var: str) -> bool:
     pass
 
 
-def create_variable(var: str) -> Variable:
+def create_variable(var: str) -> 'Variable':
     """Create a user-defined variable with the given name."""
     pass
 
 
-def attach_formula_to_variable(var: Union[str, Variable], formula: Tuple[str, str], priority: int) -> Formula:
+def attach_formula_to_variable(var: Union[str, 'Variable'], formula: Tuple[str, str], priority: int) -> 'Formula':
     """Create and attach a formula to the given variable."""
     pass
 
