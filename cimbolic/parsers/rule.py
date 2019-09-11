@@ -1,13 +1,10 @@
 from decimal import Decimal
 from typing import Union
 
-import lazy_import
 import pyparsing as pp
 
 from ..exceptions import VariableNotFoundError
 from .utils import evaluator
-
-Variable = lazy_import.lazy_module('cimbolic.models.Variable')
 
 
 # Real number grammar ---------------------------------------------------------
@@ -21,6 +18,8 @@ real_number.setParseAction(lambda toks: Decimal(toks[0]) if '.' in toks[0] else 
 # Named variable grammar ------------------------------------------------------
 def to_value(toks: pp.ParseResults) -> Union[int, Decimal]:
     """Fetch the variable from the database and return its value."""
+    from django.apps import apps
+    Variable = apps.get_model('cimbolic', 'Variable')
     var_name = toks[0]
     try:
         var = Variable.objects.get(name=var_name)
