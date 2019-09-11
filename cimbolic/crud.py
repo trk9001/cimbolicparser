@@ -62,6 +62,7 @@ def attach_formula_to_variable(variable: Union[str, Variable], formula: Tuple[st
 def update_variable(variable: Union[str, Variable], name: str = None, source_model: str = None,
                     description: str = None, type: str = None, is_active: bool = None) -> Variable:
     """Update a user-defined variable with the given name."""
+    # TODO: Optimize function to use a new_data dictionary instead of kwargs.
     fields = {}
     if name:
         fields['name'] = name
