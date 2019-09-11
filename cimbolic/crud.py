@@ -1,4 +1,6 @@
-from typing import Tuple, Union
+from typing import Any, Dict, List, Tuple, Union
+
+from django.core.exceptions import FieldDoesNotExist
 
 from .exceptions import VariableNotFoundError
 from .models import Variable, Formula
@@ -63,26 +65,20 @@ def attach_formula_to_variable(variable: Union[str, Variable], formula: Union[Fo
     return formula
 
 
-def update_variable(variable: Union[str, Variable], name: str = None, source_model: str = None,
-                    description: str = None, type: str = None, is_active: bool = None) -> Variable:
-    """Update a user-defined variable with the given name."""
-    # TODO: Optimize function to use a new_data dictionary instead of kwargs.
-    fields = {}
-    if name:
-        fields['name'] = name
-    if description:
-        fields['description'] = description
-    if type:
-        fields['type'] = type
-    if source_model:
-        fields['source_model'] = source_model
-    if is_active:
-        fields['is_active'] = is_active
+def update_variable(variable: Union[str, Variable], data: Dict[str, Any]) -> Tuple[Variable, List[str]]:
+    """Update a user-defined variable with the given name, using the data dictionary."""
+    updated_fields = []
     variable = _clean_to_variable(variable)
-    for key in fields:
-        setattr(variable, key, fields[key])
-    variable.save(update_fields=list(fields.keys()))
-    return variable
+    for key in data:
+        try:
+            variable._meta.get_field(key)
+        except FieldDoesNotExist:
+            pass
+        else:
+            setattr(variable, key, data[key])
+            updated_fields.append(key)
+    variable.save(update_fields=updated_fields)
+    return variable, updated_fields
 
 
 def delete_variable(variable: Union[str, Variable], mark_inactive_only: bool = False) -> str:
