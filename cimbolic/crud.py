@@ -4,7 +4,7 @@ from .exceptions import VariableNotFoundError
 from .models import Variable, Formula
 
 
-def clean_variable_name(var: str) -> str:
+def _clean_variable_name(var: str) -> str:
     """Clean a variable name."""
     return var.lstrip('$')
 
@@ -12,7 +12,7 @@ def clean_variable_name(var: str) -> str:
 def _clean_to_variable(var: Union[str, Variable]) -> Variable:
     """Get a Variable referenced by a string (or not) and return it."""
     if isinstance(var, str):
-        var = clean_variable_name(var)
+        var = _clean_variable_name(var)
         try:
             variable = Variable.objects.get(name=var)
         except Variable.DoesNotExist:
@@ -24,7 +24,7 @@ def _clean_to_variable(var: Union[str, Variable]) -> Variable:
 
 def variable_exists(var: str) -> bool:
     """Check whether a variable of the given name exists."""
-    var = clean_variable_name(var)
+    var = _clean_variable_name(var)
     try:
         Variable.objects.get(name=var)
     except Variable.DoesNotExist:
