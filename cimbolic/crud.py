@@ -33,13 +33,13 @@ def variable_exists(var: str) -> bool:
         return True
 
 
-def create_variable(name: str, source_model: str, description: str = '',
+def create_variable(name: str, source_model: str, description: str = None,
                     type: str = Variable.USER_DEFINED, is_active: bool = True) -> Variable:
     """Create a user-defined variable with the given name."""
     var = Variable.objects.create(
         name=name,
         source_model=source_model,
-        description=description,
+        description=description or '',
         type=type,
         is_active=is_active
     )
@@ -59,6 +59,27 @@ def attach_formula_to_variable(variable: Union[str, Variable], formula: Tuple[st
         is_active=is_active
     )
     return formula
+
+
+def update_variable(variable: Union[str, Variable], name: str = None, source_model: str = None,
+                    description: str = None, type: str = None, is_active: bool = None) -> Variable:
+    """Update a user-defined variable with the given name."""
+    fields = {}
+    if name:
+        fields['name'] = name
+    if description:
+        fields['description'] = description
+    if type:
+        fields['type'] = type
+    if source_model:
+        fields['source_model'] = source_model
+    if is_active:
+        fields['is_active'] = is_active
+    variable = _clean_to_variable(variable)
+    for key in fields:
+        setattr(variable, key, fields[key])
+    variable.save(update_fields=list(fields.keys()))
+    return variable
 
 
 def delete_variable(variable: Union[str, Variable], mark_inactive_only: bool = False) -> str:
