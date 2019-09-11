@@ -19,4 +19,5 @@ def dummy_function(arg=None, another_arg=None):
 
 system_defined_variables = {
     'DUMMY_VAR': (dummy_function, ['arg', 'another_arg']),
+    'DUMMY_VAL': (420, ),
 }
