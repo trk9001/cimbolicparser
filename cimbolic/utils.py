@@ -4,7 +4,7 @@ from typing import Dict, Tuple, Union
 
 from django.conf import settings
 
-from .models import Variable, Formula
+from . import SYSTEM_DEFINED_VARIABLE_FILE_NAME
 
 SYSTEM_DEFINED_VARIABLE_FILE_NAME = 'cimbolicsysvars.py'
 

@@ -3,7 +3,7 @@ import os.path
 from django.conf import settings
 from django.core.checks import ERROR
 
-from .utils import SYSTEM_DEFINED_VARIABLE_FILE_NAME
+from . import SYSTEM_DEFINED_VARIABLE_FILE_NAME
 
 
 def check_for_system_defined_variable_file(app_configs, **kwargs):
