@@ -1,5 +1,6 @@
 # Cimbolic Language & Parser
 
+[![Cimbolic package in CimbolicArtifacts@Release feed in Azure Artifacts][artifact-badge]][artifact-feed]
 ![Project status][status-badge]
 
 [Cimbolic] is a custom mathematical language and parser library consisting of
@@ -49,7 +50,7 @@ database.
 
 ## To be done
 
-- [ ] Set up versioning
+- [x] Set up versioning
 - [ ] Write tests using `pytest` (see *pytest-django*)
 - [ ] Confirm stakeholders in README.md
 - [ ] Set up CI/CD and hosting
@@ -61,6 +62,8 @@ Copyright (c) 2019 [Cimplux]
 All rights reserved.
 
 
+[artifact-badge]: https://feeds.dev.azure.com/Cimplux/_apis/public/Packaging/Feeds/579d1985-2075-47d1-85f8-ef79ffb60b1d@2bcb900b-298d-4344-81bf-afb0c5036aa2/Packages/d9df735d-583b-4f2e-b71c-cc54ace519ca/Badge
+[artifact-feed]: https://dev.azure.com/Cimplux/CimbolicParser/_packaging?_a=package&feed=579d1985-2075-47d1-85f8-ef79ffb60b1d%402bcb900b-298d-4344-81bf-afb0c5036aa2&package=d9df735d-583b-4f2e-b71c-cc54ace519ca&preferRelease=true
 [status-badge]: https://img.shields.io/badge/status-under_development-green.svg
 [Cimbolic]: https://dev.azure.com/Cimplux/CimbolicParser "View the repository on Azure DevOps"
 [Cimplux]: http://www.cimplux.com "Visit the Cimplux homepage"
