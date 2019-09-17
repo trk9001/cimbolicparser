@@ -1,7 +1,8 @@
 from os import path
 from setuptools import find_packages, setup
 
-# See https://github.com/pypa/sampleproject/blob/master/setup.py for details.
+# See https://setuptools.readthedocs.io/en/latest/setuptools.html and
+# https://github.com/pypa/sampleproject/blob/master/setup.py for details.
 
 root_directory = path.abspath(path.dirname(__file__))
 with open(path.join(root_directory, 'README.md'), encoding='utf-8') as f:
@@ -10,7 +11,7 @@ with open(path.join(root_directory, 'VERSION.txt'), encoding='utf-8') as f:
     version = f.read().strip()
 
 setup(
-    name='cimbolic',
+    name='Cimbolic',
     version=version,
     description='Cimbolic Language & Parser',
     long_description=long_description,
@@ -34,9 +35,11 @@ setup(
         'Topic :: Text Processing',
         ],
     packages=find_packages(),
+    py_modules=['cimbolicsysvars'],
     python_requires='>=3.6',
     install_requires=['pyparsing >=2.4'],
     package_data={'cimbolic': ['management/commands/*']},
+    zip_safe=False,
     project_urls={
         'Source': 'https://dev.azure.com/Cimplux/_git/CimbolicParser',
     },
