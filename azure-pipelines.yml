@@ -1,27 +1,30 @@
-# Python package
-# Create and test a Python package on multiple Python versions.
-# Add steps that analyze code, save the dist with the build record, publish to a PyPI-compatible index, and more:
-# https://docs.microsoft.com/azure/devops/pipelines/languages/python
-
 trigger:
-- master
+  batch: true
+  branches:
+    include:
+      - master
 
 pool:
   vmImage: 'ubuntu-latest'
-strategy:
-  matrix:
-    Python36:
-      python.version: '3.6'
-    Python37:
-      python.version: '3.7'
 
 steps:
 - task: UsePythonVersion@0
+  displayName: 'Use Python 3.6 (the minimum supported)'
   inputs:
-    versionSpec: '$(python.version)'
-  displayName: 'Use Python $(python.version)'
+    versionSpec: '3.6'
 
 - script: |
-    python -m pip install --upgrade pip
-    pip install -r requirements.txt
-  displayName: 'Install dependencies'
+    python -m pip install --upgrade pip setuptools
+    pip install wheel twine
+  displayName: 'Install build tools'
+
+- script: python setup.py sdist bdist_wheel
+  displayName: 'Build source distribution and wheel'
+
+- task: TwineAuthenticate@1
+  inputs:
+    artifactFeed: 'CimbolicReleases'
+
+- script: twine upload -r CimbolicReleases --config-file $(PYPIRC_PATH) dist/*
+  displayName: 'Publish the packages'
+  
