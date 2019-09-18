@@ -10,8 +10,6 @@ rules). The project is under development in and by [Cimplux].
 Other details:
 - Project type: Reusable Django application
 - Project starting date: 27 August 2019
-- Stakeholders:
-    - [Raihan Ahmed Dip](mailto:raihan.dip@cimplux.com "Contact via e-mail")
 - Contributors:
     - [A. G. M. Imam Hossain](mailto:imam.hossain@cimplux.com "Contact via e-mail")
     - [Sharif M. Tarik](mailto:s.tarik@cimplux.com "Contact via e-mail")
@@ -52,8 +50,10 @@ database.
 
 - [x] Set up versioning
 - [ ] Write tests using `pytest` (see *pytest-django*)
-- [ ] Confirm stakeholders in README.md
+- [x] Confirm stakeholders in README.md
 - [ ] Set up CI/CD and hosting
+- [ ] Set up a git flow workflow
+- [ ] Add docs
 
 
 ## Copyright
