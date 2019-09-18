@@ -51,7 +51,7 @@ database.
 - [x] Set up versioning
 - [ ] Write tests using `pytest` (see *pytest-django*)
 - [x] Confirm stakeholders in README.md
-- [ ] Set up CI/CD and hosting
+- [x] Set up CI/CD and hosting
 - [ ] Set up a git flow workflow
 - [ ] Add docs
 
