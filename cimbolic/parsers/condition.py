@@ -1,6 +1,7 @@
 import pyparsing as pp
 
-from .rule_parser import arithmetic_expression
+from .rule import arithmetic_expression
+from .utils import evaluator
 
 # Quoted string grammar -------------------------------------------------------
 allowed_chars_in_string = list(pp.printables)
@@ -49,5 +50,10 @@ conditional_expression <<= (
 # ---
 
 
-class ConditionParser():
-    pass
+def evaluate_condition(condition_: str) -> bool:
+    """Parse the input condition and return a corresponding boolean value."""
+    if condition_.strip().upper() == 'NULL':
+        return True
+    else:
+        result = evaluator(conditional_expression.parseString(condition_))
+        return result
