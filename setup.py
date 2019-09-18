@@ -7,7 +7,7 @@ from setuptools import find_packages, setup
 root_directory = path.abspath(path.dirname(__file__))
 with open(path.join(root_directory, 'README.md'), encoding='utf-8') as f:
     long_description = f.read()
-with open(path.join(root_directory, 'VERSION.txt'), encoding='utf-8') as f:
+with open(path.join(root_directory, 'VERSION'), encoding='utf-8') as f:
     version = f.read().strip()
 
 setup(
