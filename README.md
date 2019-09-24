@@ -53,8 +53,10 @@ database.
 - [ ] Write tests using `pytest` (see *pytest-django*)
 - [x] Confirm stakeholders in README.md
 - [x] Set up CI/CD and hosting
-- [ ] Set up a git flow workflow
+- [x] Set up a git flow workflow
 - [ ] Add docs
+- [ ] Add a changelog
+- [ ] Add Django forms
 
 
 ## Copyright
