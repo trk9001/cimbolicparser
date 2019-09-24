@@ -92,12 +92,14 @@ class Formula(models.Model):
         related_name='formulae',
         related_query_name='formula',
     )
-    condition = models.TextField(
+    condition = models.CharField(
         help_text='Cimbolic condition for the rule to be set',
+        max_length=1000,
         default='NULL',
     )
-    rule = models.TextField(
+    rule = models.CharField(
         help_text='Cimbolic arithmetic rule to be set',
+        max_length=1000,
     )
     priority = models.PositiveIntegerField(
         help_text=(
