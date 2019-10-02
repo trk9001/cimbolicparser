@@ -1,17 +1,15 @@
-import os
-
 import environ
 
-BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+root_dir = environ.Path(__file__) - 2
+environ.Env.read_env(root_dir('.env'))
 
-environ.Env.read_env(os.path.join(BASE_DIR, '.env'))
-env = environ.Env()
+env = environ.Env(DEBUG=(bool, True))
 
-DATABASES = {
-    'default': env.db(),
-}
+BASE_DIR = root_dir()
 
-DEBUG = True
+DATABASES = {'default': env.db()}
+
+DEBUG = env('DEBUG')
 
 INSTALLED_APPS = [
     'django.contrib.admin',
