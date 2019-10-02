@@ -1,3 +1,4 @@
+# noinspection PyPackageRequirements
 import environ
 
 root_dir = environ.Path(__file__) - 2
