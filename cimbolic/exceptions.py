@@ -9,5 +9,5 @@ class VariableNotFoundError(Exception):
 
 
 class VariableNotDefinedError(Exception):
-    """Raised when a variable exists but isn't defined properly."""
+    """Raised when a variable exists but isn't defined in a proper manner."""
     pass
