@@ -1,27 +1,27 @@
 from django.core.management.base import BaseCommand
 
+from cimbolic import get_system_variables
 from cimbolic.models import Variable
-from cimbolic.utils import get_system_defined_variables
 
 
 class Command(BaseCommand):
     """Management command to populate Variable objects with system variables.
 
-    It collects variables that are referenced in the cimbolicsysvars.py file
+    It collects variables that are referenced in the cimbolic_vars.py file
     in the project's root directory, but whose names do not exist among the
     Variable objects. It then creates Variable objects from those variables,
     given that no clashing occurs with the existing Variable objects. If an
-    inactive system-defined Variable object exists (is_active == False), it
+    inactive system-sourced Variable object exists (is_active == False), it
     also marks the Variable object as active.
 
-    It also marks Variable objects not referenced in cimbolicsysvars.py anymore
+    It also marks Variable objects not referenced in cimbolic_vars.py anymore
     as inactive (is_active = False). This means that the mentioned file is the
-    only way for a developer to add system_defined variables.
+    only way for a developer to add system-sourced variables.
     """
-    help = 'Loads system-defined variables from cimbolicsysvars.py into the Variable model'
+    help = 'Loads system-sourced variables from cimbolic_vars.py into the Variable model'
 
     def handle(self, *args, **options):
-        sys_vars = get_system_defined_variables()
+        sys_vars = get_system_variables()
 
         vars_added = []
         for var in sys_vars:

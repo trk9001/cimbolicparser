@@ -35,7 +35,7 @@ setup(
         'Topic :: Text Processing',
         ],
     packages=find_packages(),
-    py_modules=['cimbolicsysvars'],
+    py_modules=['cimbolic_vars'],
     python_requires='>=3.6',
     install_requires=['pyparsing >=2.4'],
     package_data={'cimbolic': ['management/commands/*']},

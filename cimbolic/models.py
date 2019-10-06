@@ -4,9 +4,9 @@ from typing import Any, Dict, Iterable, Union
 from django.core.validators import MinValueValidator, RegexValidator
 from django.db import models
 
+from . import get_system_variables
 from .exceptions import DefaultFormulaMissingError, VariableNotDefinedError
 from .parsers import evaluate_condition, evaluate_rule
-from .utils import get_system_defined_variables
 
 
 class Variable(models.Model):
@@ -58,7 +58,7 @@ class Variable(models.Model):
     def to_value(self, context: Dict[str, Any] = None) -> Union[int, Decimal]:
         """Parse the variable's formulae and return a value."""
         if self.type == self.SYSTEM_DEFINED:
-            sys_vars = get_system_defined_variables()
+            sys_vars = get_system_variables()
             if self.name not in sys_vars.keys():
                 raise VariableNotDefinedError(f'System variable {self.name} undefined')
             result, result_args = sys_vars[self.name]

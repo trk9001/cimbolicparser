@@ -32,17 +32,17 @@ Other details:
 3. Run `python manage.py migrate` to create the *Variable* and *Formula*
 tables.
 
-### Defining system variables
+### Defining system-sourced variables
 
-1. Create a file called cimbolicsysvars.py in your project's root directory
-and add system variables to it as shown in the example file provided.
+1. Create a file called cimbolic_vars.py in your project's root directory
+and add system-sourced variables to it as shown in the example file provided.
 
-2. Run `python manage.py loadsysvars` to load the system variables into the
-database.
+2. Run `python manage.py loadvars` to load the system-sourced variables into
+the database.
 
 3. For more info, please ask the contributors directly.
 
-### Managing user-defined variables
+### Managing user-sourced variables
 
 1. For info, please ask the contributors directly.
 
