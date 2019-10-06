@@ -55,7 +55,7 @@ database.
 - [x] Set up CI/CD and hosting
 - [x] Set up a git flow workflow
 - [ ] Add docs
-- [ ] Add a changelog
+- [x] Add a changelog
 - [ ] Add Django forms
 
 
