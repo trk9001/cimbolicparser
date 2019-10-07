@@ -1,7 +1,7 @@
-"""Example file to demonstrate the mapping of system-level variables.
+"""Example file to demonstrate the mapping of system-sourced variables.
 
-This file demonstrate the usage of a dictionary to map actions (values or
-callables) to system-defined (or more accurately, developer-defined variables).
+This file demonstrates the usage of a dictionary to map actions (values or
+callables) to system-sourced (or more accurately, developer-defined) variables.
 Please note that the name of the file and the name of the dictionary MUST BE AS
 IS SHOWN HERE.
 
@@ -17,7 +17,7 @@ def dummy_function(arg=None, another_arg=None):
     return arg and another_arg
 
 
-system_defined_variables = {
+system_variables = {
     'DUMMY_VAR': (dummy_function, ['arg', 'another_arg']),
     'DUMMY_VAL': (420, []),
 }
