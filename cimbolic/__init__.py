@@ -1,6 +1,6 @@
 import os
 from importlib import util as import_util
-from typing import Dict, Tuple
+from typing import Any, Dict, List, Tuple
 
 from django.conf import settings
 
@@ -11,7 +11,7 @@ default_app_config = 'cimbolic.apps.CimbolicConfig'
 SYSTEM_VARIABLES_FILE = 'cimbolic_vars.py'
 
 
-def get_system_variables() -> Dict[str, Tuple]:
+def get_system_variables() -> Dict[str, Tuple[Any, List[str]]]:
     """Read the file in which system-sourced variables are stored and return them."""
     file_path = os.path.join(settings.BASE_DIR, SYSTEM_VARIABLES_FILE)
     module_name = ''.join(SYSTEM_VARIABLES_FILE.split('.')[:-1])
