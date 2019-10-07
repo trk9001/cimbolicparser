@@ -6,7 +6,7 @@ from django.db import models
 
 from . import get_system_variables
 from .exceptions import *
-from .parsers import evaluate_condition, evaluate_rule
+from .parsing import Condition, Rule
 
 
 class Variable(models.Model):
@@ -160,8 +160,8 @@ class Variable(models.Model):
             if not prioritized_formulae.exists():
                 raise VariableNotDefinedError(f'No formula defined for variable {self.name}')
             for formula in prioritized_formulae:
-                if formula.condition_to_boolean():
-                    result = formula.rule_to_value()
+                if formula.condition_to_boolean(context):
+                    result = formula.rule_to_value(context)
                     return result
 
 
@@ -225,12 +225,14 @@ class Formula(models.Model):
     def __str__(self):
         return f'{self.variable} > priority {self.priority}'
 
-    def condition_to_boolean(self) -> bool:
+    def condition_to_boolean(self, context: Optional[Dict] = None) -> bool:
         """Parse the condition and return a boolean result."""
-        result = evaluate_condition(self.condition)
+        cond = Condition(self.condition, context)
+        result = cond.evaluate()
         return result
 
-    def rule_to_value(self) -> Union[str, int, Decimal]:
+    def rule_to_value(self, context: Optional[Dict] = None) -> Union[int, Decimal]:
         """Parse the rule and evaluate it to give a result."""
-        result = evaluate_rule(self.rule)
+        rule = Rule(self.rule, context)
+        result = rule.evaluate()
         return result
