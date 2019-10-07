@@ -8,6 +8,7 @@ changelog is adapted from [Keep a Changelog](https://keepachangelog.com/).
 
 ### Added
 - Support for context passing in the core parsing component.
+- Support for context propagation in the Django models.
 - This changelog. :)
 
 ### Changed
@@ -16,6 +17,9 @@ changelog is adapted from [Keep a Changelog](https://keepachangelog.com/).
   - Replaced all instances of "system-defined variables" (old terminology) with
   "system-sourced variables" (new terminology).
   - Accordingly, rename a few things and update their references.
+- The `source_model` field in the Variable model has been changed to a more
+accurate `related_data_path` and added more processing for it.
+- Corrections in help texts and docstrings.
 
 ### Fixed
 - Context getting lost during parsing of `named_variable` tokens.
