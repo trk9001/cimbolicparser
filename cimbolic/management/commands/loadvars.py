@@ -26,7 +26,7 @@ class Command(BaseCommand):
         vars_added = []
         for var in sys_vars:
             if not Variable.objects.filter(name=var).exists():
-                Variable.objects.create(name=var, type=Variable.SYSTEM_DEFINED, is_active=True)
+                Variable.objects.create(name=var, source=Variable.SYSTEM, is_active=True)
                 vars_added.append(var)
             else:
                 v = Variable.objects.get(name=var)
@@ -42,7 +42,7 @@ class Command(BaseCommand):
             self.stdout.write(self.style.SUCCESS(f'{vars_added[-1]}'))
 
         vars_marked_inactive = []
-        sys_vars_in_db = Variable.objects.filter(type=Variable.SYSTEM_DEFINED, is_active=True)
+        sys_vars_in_db = Variable.objects.filter(source=Variable.SYSTEM, is_active=True)
         for var in sys_vars_in_db:
             if var.name not in sys_vars:
                 vars_marked_inactive.append(var.name)
