@@ -11,3 +11,7 @@ class VariableNotFoundError(Exception):
 class VariableNotDefinedError(Exception):
     """Raised when a variable exists but isn't defined in a proper manner."""
     pass
+
+class VariableRelatedDataError(Exception):
+    """Raised during processing of a variable's related data."""
+    pass
