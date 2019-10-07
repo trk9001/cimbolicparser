@@ -1,6 +1,6 @@
 """Example file to demonstrate the mapping of system-sourced variables.
 
-This file demonstrate the usage of a dictionary to map actions (values or
+This file demonstrates the usage of a dictionary to map actions (values or
 callables) to system-sourced (or more accurately, developer-defined) variables.
 Please note that the name of the file and the name of the dictionary MUST BE AS
 IS SHOWN HERE.
