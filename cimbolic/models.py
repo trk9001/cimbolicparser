@@ -183,7 +183,7 @@ class Formula(models.Model):
     )
     priority = models.PositiveIntegerField(
         help_text=(
-            'Set the ordering of condition-checking (1 is highest) '
+            'Set the priority of condition-checking (1 is highest) '
             '(Note: the priority of a \'NULL\' condition will automatically be set to be the lowest)'
         ),
         validators=[
