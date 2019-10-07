@@ -1,27 +1,45 @@
 from decimal import Decimal
-from typing import Any, Dict, Iterable, Union
+from typing import Any, Dict, Iterable, Optional, Union
 
 from django.core.validators import MinValueValidator, RegexValidator
 from django.db import models
 
 from . import get_system_variables
-from .exceptions import DefaultFormulaMissingError, VariableNotDefinedError
+from .exceptions import *
 from .parsers import evaluate_condition, evaluate_rule
 
 
 class Variable(models.Model):
     """Model representing metadata of a named variable."""
-    SYSTEM_DEFINED = 'sys'
-    USER_DEFINED = 'usr'
+    SYSTEM = 'S'
+    USER = 'U'
 
-    TYPE_CHOICES = [
-        (SYSTEM_DEFINED, 'system-defined'),
-        (USER_DEFINED, 'user-defined'),
+    SOURCE_CHOICES = [
+        (SYSTEM, 'System'),
+        (USER, 'User'),
+    ]
+
+    NONE_TYPE = ''
+    MODEL_TYPE = 'M'
+    MODEL_FIELD_TYPE = 'F'
+    MODEL_INSTANCE_TYPE = 'I'
+
+    RELATED_DATA_TYPE_CHOICES = [
+        (NONE_TYPE, 'None'),
+        (MODEL_TYPE, 'Model'),
+        (MODEL_FIELD_TYPE, 'Model field'),
+        (MODEL_INSTANCE_TYPE, 'Model instance'),
     ]
 
     name = models.CharField(
-        help_text='Name of the variable (eg: BASIC)',
-        max_length=80,
+        help_text='Name of the variable (eg: BASIC, WH_1)',
+        validators=[
+            RegexValidator(
+                r'^[a-zA-Z_][a-zA-Z0-9_]*$',
+                "Must conform to the regex '^[a-zA-Z_][a-zA-Z0-9_]*$'",
+            )
+        ],
+        max_length=100,
         unique=True,
     )
     description = models.TextField(
@@ -29,16 +47,28 @@ class Variable(models.Model):
         max_length=500,
         blank=True,
     )
-    type = models.CharField(
-        help_text='Whether the variable is system defined or user-created',
-        choices=TYPE_CHOICES,
-        max_length=3,
+    source = models.CharField(
+        help_text='Whose action the variable originates from (eg: system, user)',
+        choices=SOURCE_CHOICES,
+        max_length=1,
     )
-    source_model = models.CharField(
-        help_text='The model to which this variable belongs (eg: payroll.Component)',
+    related_data_type = models.CharField(
+        help_text='The type of the data this variable is related to (eg: model, instance)',
+        choices=RELATED_DATA_TYPE_CHOICES,
+        max_length=1,
+        blank=True,
+    )
+    related_data_path = models.CharField(
+        help_text=(
+            'The dotted path to the data to which this variable is related, '
+            'in the format {app_label}.{model_name}[.{field_name|pk}]'
+        ),
         max_length=500,
         validators=[
-            RegexValidator(r'^\w+\.\w+$'),
+            RegexValidator(
+                r'^\w+\.\w+(\.\w+)?$',
+                "Must conform to the regex '^\\w+\\.\\w+(\\.\\w+)?$'",
+            ),
         ],
         blank=True,
     )
@@ -50,30 +80,82 @@ class Variable(models.Model):
     def __str__(self):
         return f'${self.name}'
 
+    @property
+    def related_data(self) -> Any:
+        """Send a Python-object version of the variable's related data."""
+        if self.related_data_type == self.NONE_TYPE:
+            return None
+
+        from django.apps import apps
+        app_label, model_name, *extra = self.related_data_path.split('.')
+        try:
+            model = apps.get_model(app_label, model_name)
+        except Exception as exc:
+            raise VariableRelatedDataError(
+                f"Can't retrieve model from {self} variable's "
+                f"related_data_path: {self.related_data_path}"
+            ) from exc
+
+        if self.related_data_type == self.MODEL_TYPE:
+            return model
+
+        try:
+            extra = extra[0]
+        except IndexError as exc:
+            raise VariableRelatedDataError(
+                f"Missing third element from {self} variable's "
+                f"related_data_path: {self.related_data_path}"
+            ) from exc
+
+        if self.related_data_type == self.MODEL_FIELD_TYPE:
+            # No way to actually reference the Django model field, so pass its
+            # name along with the model class so that the user can use the
+            # getattr/setattr functions to get/set the field.
+            if hasattr(model, extra):
+                return model, extra
+            raise VariableRelatedDataError(
+                f"Model derived from {self} variable's "
+                f"related_data_path {self.related_data_path} "
+                f"doesn't have a field called {extra}"
+            )
+
+        if self.related_data_type == self.MODEL_INSTANCE_TYPE:
+            try:
+                instance = model.objects.get(pk=extra)
+            except model.DoesNotExist as exc:
+                raise VariableRelatedDataError(
+                    f"Model derived from {self} variable's "
+                    f"related_data_path {self.related_data_path} "
+                    f"doesn't have an instance with primary key {extra}"
+                ) from exc
+            return instance
+
     def prioritized_formulae(self) -> Union[Iterable, models.query.QuerySet]:
         """Return a queryset of the relevant formulae sorted by priority."""
         formulae = self.formulae.order_by('priority')
         return formulae
 
-    def to_value(self, context: Dict[str, Any] = None) -> Union[int, Decimal]:
+    def to_value(self, context: Optional[Dict[str, Any]] = None) -> Union[int, Decimal]:
         """Parse the variable's formulae and return a value."""
-        if self.type == self.SYSTEM_DEFINED:
+        if self.source == self.SYSTEM:
             sys_vars = get_system_variables()
-            if self.name not in sys_vars.keys():
+            try:
+                result, result_args = sys_vars[self.name]
+            except KeyError:
                 raise VariableNotDefinedError(f'System variable {self.name} undefined')
-            result, result_args = sys_vars[self.name]
             if callable(result):
                 result_kwargs = {}
+                context = context or {}
                 for key in result_args:
                     if key in context.keys():
                         result_kwargs[key] = context[key]
                     else:
-                        raise KeyError(f'Missing argument {key} to callable {result.__name__}()')
+                        raise KeyError(f'Missing argument {key} to callable {result.__name__}')
                 return result(**result_kwargs)
             else:
                 return result
 
-        if self.type == self.USER_DEFINED:
+        if self.source == self.USER:
             prioritized_formulae = self.prioritized_formulae()
             if not prioritized_formulae.exists():
                 raise VariableNotDefinedError(f'No formula defined for variable {self.name}')
