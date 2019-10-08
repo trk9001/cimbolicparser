@@ -38,8 +38,8 @@ class Command(BaseCommand):
         if vars_added:
             self.stdout.write(self.style.SUCCESS('The following variables have been loaded or activated: '), ending='')
             for var in vars_added[:-1]:
-                self.stdout.write(self.style.SUCCESS(f'{var}'), ending=', ')
-            self.stdout.write(self.style.SUCCESS(f'{vars_added[-1]}'))
+                self.stdout.write(self.style.SUCCESS(f'${var}'), ending=', ')
+            self.stdout.write(self.style.SUCCESS(f'${vars_added[-1]}'))
 
         vars_marked_inactive = []
         sys_vars_in_db = Variable.objects.filter(source=Variable.SYSTEM, is_active=True)
@@ -52,8 +52,8 @@ class Command(BaseCommand):
         if vars_marked_inactive:
             self.stdout.write(self.style.SUCCESS('The following variables have been marked as inactive: '), ending='')
             for var in vars_marked_inactive[:-1]:
-                self.stdout.write(self.style.SUCCESS(f'{var}'), ending=', ')
-            self.stdout.write(self.style.SUCCESS(f'{vars_marked_inactive[-1]}'))
+                self.stdout.write(self.style.SUCCESS(f'${var}'), ending=', ')
+            self.stdout.write(self.style.SUCCESS(f'${vars_marked_inactive[-1]}'))
 
         if not vars_added and not vars_marked_inactive:
             return self.style.SUCCESS('Done')
