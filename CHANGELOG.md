@@ -7,6 +7,8 @@ changelog is adapted from [Keep a Changelog](https://keepachangelog.com/).
 ## Unreleased
 
 ### Added
+- A custom Django management command to list all the context keyword argument
+names needed by specified variables.
 - Support for context passing in the core parsing component.
 - Support for context propagation in the Django models.
 - This changelog. :)
@@ -19,6 +21,7 @@ changelog is adapted from [Keep a Changelog](https://keepachangelog.com/).
   - Accordingly, rename a few things and update their references.
 - The `source_model` field in the Variable model has been changed to a more
 accurate `related_data_path` and added more processing for it.
+- The management command `removeinactivevars` has been renamed to `flushvars`.
 - Corrections in help texts and docstrings.
 
 ### Fixed

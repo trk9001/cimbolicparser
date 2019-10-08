@@ -1,5 +1,6 @@
+import re
 from decimal import Decimal
-from typing import Any, Dict, Iterable, Optional, Union
+from typing import Any, Dict, Iterable, List, Optional, Union
 
 from django.core.validators import MinValueValidator, RegexValidator
 from django.db import models
@@ -130,6 +131,10 @@ class Variable(models.Model):
                 ) from exc
             return instance
 
+    def context_keys(self) -> List[str]:
+        context_keys = get_all_context_keys(self)
+        return context_keys
+
     def prioritized_formulae(self) -> Union[Iterable, models.query.QuerySet]:
         """Return a queryset of the relevant formulae sorted by priority."""
         formulae = self.formulae.order_by('priority')
@@ -142,7 +147,7 @@ class Variable(models.Model):
             try:
                 result, result_args = sys_vars[self.name]
             except KeyError:
-                raise VariableNotDefinedError(f'System variable {self.name} undefined')
+                raise VariableNotDefinedError(f'System variable {self} undefined')
             if callable(result):
                 result_kwargs = {}
                 context = context or {}
@@ -236,3 +241,34 @@ class Formula(models.Model):
         rule = Rule(self.rule, context)
         result = rule.evaluate()
         return result
+
+
+named_variable_pattern = r'\$([a-zA-Z_][a-zA-Z0-9_]*)'
+named_variable_regex = re.compile(named_variable_pattern)
+
+
+def get_all_context_keys(variable: Variable) -> List[str]:
+    """Get every dependency (variable or context key) for a particular rule."""
+    context_keys: List[str] = []
+    if variable.source == variable.SYSTEM:
+        try:
+            fn, keys = get_system_variables()[variable.name]
+        except KeyError:
+            raise VariableNotDefinedError(f'System variable {variable} undefined')
+        if callable(fn):
+            context_keys.extend(keys)
+    else:
+        # TODO: Add DP or caching
+        rules: List[str] = [formula.rule for formula in variable.formulae.all()]
+        for rule in rules:
+            named_variables = named_variable_regex.findall(rule)
+            for named_var in named_variables:
+                try:
+                    var = Variable.objects.get(name=named_var)
+                except Variable.DoesNotExist:
+                    raise VariableNotFoundError(
+                        f'Nonexistent variable ${named_var} referenced in rule: {rule}'
+                    )
+                context_keys.extend(get_all_context_keys(var))
+    # TODO: Remove duplicates before returning
+    return context_keys
