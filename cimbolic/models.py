@@ -1,5 +1,6 @@
 import re
 from decimal import Decimal
+from functools import lru_cache
 from typing import Any, Dict, Iterable, List, Optional, Union
 
 from django.core.validators import MinValueValidator, RegexValidator
@@ -206,7 +207,7 @@ class Formula(models.Model):
         verbose_name_plural = 'formulae'
 
     def save(self, *args, **kwargs):
-        # Disallow saving if no 'NULL' condition exists
+        # Disallow saving if no 'NULL' condition exists.
         siblings = Formula.objects.filter(variable=self.variable)
         if self.pk is not None:
             siblings = siblings.exclude(pk=self.pk)
@@ -243,10 +244,10 @@ class Formula(models.Model):
         return result
 
 
-named_variable_pattern = r'\$([a-zA-Z_][a-zA-Z0-9_]*)'
-named_variable_regex = re.compile(named_variable_pattern)
+named_variable_regex = re.compile(r'\$([a-zA-Z_][a-zA-Z0-9_]*)')
 
 
+@lru_cache(maxsize=64)
 def get_all_context_keys(variable: Variable) -> List[str]:
     """Get every dependency (variable or context key) for a particular rule."""
     context_keys: List[str] = []
@@ -258,7 +259,6 @@ def get_all_context_keys(variable: Variable) -> List[str]:
         if callable(fn):
             context_keys.extend(keys)
     else:
-        # TODO: Add DP or caching
         rules: List[str] = [formula.rule for formula in variable.formulae.all()]
         for rule in rules:
             named_variables = named_variable_regex.findall(rule)
@@ -270,5 +270,6 @@ def get_all_context_keys(variable: Variable) -> List[str]:
                         f'Nonexistent variable ${named_var} referenced in rule: {rule}'
                     )
                 context_keys.extend(get_all_context_keys(var))
-    # TODO: Remove duplicates before returning
+    # Eliminate duplicates.
+    context_keys = list(set(context_keys))
     return context_keys

@@ -31,6 +31,7 @@ class Command(BaseCommand):
             except Variable.DoesNotExist:
                 raise CommandError(f'Variable ${var_name} not found in the database')
 
+        get_all_context_keys.cache_clear()
         context_key_dict = dict([
             (variable.name, set(get_all_context_keys(variable)))
             for variable in variables
