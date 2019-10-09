@@ -19,6 +19,7 @@ names needed by specified variables.
   - Replaced all instances of "system-defined variables" (old terminology) with
   "system-sourced variables" (new terminology).
   - Accordingly, rename a few things and update their references.
+- The Cimbolic language is now case-insensitive (except for variable names).
 - The `source_model` field in the Variable model has been changed to a more
 accurate `related_data_path` and added more processing for it.
 - The management command `removeinactivevars` has been renamed to `flushvars`.
