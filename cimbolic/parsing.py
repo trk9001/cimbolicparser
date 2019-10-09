@@ -78,7 +78,12 @@ _arithmetic_expression = pp.Forward()
 # ---
 
 # Aggregate macro grammar -----------------------------------------------------
-_aggregate_macro_names_allowed = 'max min'
+_aggregate_macro_name = pp.oneOf('max min', caseless=True)
+_aggregate_macro = (
+    pp.Combine(_aggregate_macro_name + pp.Suppress('('))
+    + pp.Group(_arithmetic_expression + pp.ZeroOrMore(pp.Literal(',') + _arithmetic_expression))
+    + pp.Suppress(')')
+)
 
 
 def _aggregate_macro_evaluator(toks: Tokens) -> Numeric:
@@ -97,14 +102,7 @@ def _aggregate_macro_evaluator(toks: Tokens) -> Numeric:
     return result
 
 
-_aggregate_macro_name = pp.oneOf(_aggregate_macro_names_allowed)
-_aggregate_macro = (
-    pp.Combine(_aggregate_macro_name + pp.Suppress('('))
-    + pp.Group(_arithmetic_expression + pp.ZeroOrMore(pp.Literal(',') + _arithmetic_expression))
-    + pp.Suppress(')')
-)
 _aggregate_macro.setParseAction(_aggregate_macro_evaluator)
-# See the Rule class for a ParseAction.
 # ---
 
 # Arithmetic term grammar -----------------------------------------------------
@@ -152,13 +150,16 @@ _conditional_operator_all = _conditional_operator_equality | _conditional_operat
 # ---
 
 # Logical operator grammar ----------------------------------------------------
-_logical_combination_operator = pp.Keyword('and') | pp.Keyword('or')
-_logical_negation_operator = pp.Keyword('not')
+_logical_combination_operator = pp.CaselessKeyword('and') | pp.CaselessKeyword('or')
+_logical_negation_operator = pp.CaselessKeyword('not')
 # ---
 
 # Boolean and null value grammar ----------------------------------------------
-_boolean_value = pp.oneOf('true false').setParseAction(lambda toks: True if toks[0] == 'true' else False)
-_null = pp.Literal('null').setParseAction(lambda toks: None)
+_boolean_value = (
+    pp.oneOf('true false', caseless=True)
+    .setParseAction(lambda toks: True if toks[0].upper() == 'TRUE' else False)
+)
+_null = pp.CaselessLiteral('null').setParseAction(lambda toks: None)
 # ---
 
 # Conditional expression grammar ----------------------------------------------
