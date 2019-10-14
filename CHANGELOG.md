@@ -25,6 +25,9 @@ accurate `related_data_path` and added more processing for it.
 - The management command `removeinactivevars` has been renamed to `flushvars`.
 - Corrections in help texts and docstrings.
 
+### Removed
+- The `crud` module in favor of using the Cimbolic models directly.
+
 ### Fixed
 - Context getting lost during parsing of `named_variable` tokens.
 - Index errors on MySQL due to large text fields.
