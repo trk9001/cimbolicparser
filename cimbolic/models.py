@@ -1,7 +1,7 @@
 import re
 from decimal import Decimal
 from functools import lru_cache
-from typing import Any, Dict, Iterable, List, Optional, Union
+from typing import Any, Dict, List, Optional, Union
 
 from django.core.validators import MinValueValidator, RegexValidator
 from django.db import models
@@ -52,7 +52,9 @@ class Variable(models.Model):
     source = models.CharField(
         help_text='Whose action the variable originates from (eg: system, user)',
         choices=SOURCE_CHOICES,
+        default=USER,
         max_length=1,
+        blank=True,
     )
     related_data_type = models.CharField(
         help_text='The type of the data this variable is related to (eg: model, instance)',
@@ -77,6 +79,7 @@ class Variable(models.Model):
     is_active = models.BooleanField(
         help_text='Whether the variable is currently active',
         default=True,
+        blank=True,
     )
 
     def __str__(self):
@@ -132,11 +135,20 @@ class Variable(models.Model):
                 ) from exc
             return instance
 
+    @property
     def context_keys(self) -> List[str]:
+        """Return a list of required context keys for this variable."""
         context_keys = get_all_context_keys(self)
         return context_keys
 
-    def prioritized_formulae(self) -> Union[Iterable, models.query.QuerySet]:
+    def add_formula(self, condition: str, rule: str, priority: int) -> 'Formula':
+        """Convenience method to easily create a related formula."""
+        formula = self.formulae.create(
+            condition=condition, rule=rule, priority=priority
+        )
+        return formula
+
+    def prioritized_formulae(self) -> models.query.QuerySet:
         """Return a queryset of the relevant formulae sorted by priority."""
         formulae = self.formulae.order_by('priority')
         return formulae
@@ -249,7 +261,7 @@ named_variable_regex = re.compile(r'\$([a-zA-Z_][a-zA-Z0-9_]*)')
 
 @lru_cache(maxsize=64)
 def get_all_context_keys(variable: Variable) -> List[str]:
-    """Get every dependency (variable or context key) for a particular rule."""
+    """Get every context key dependency for a particular variable."""
     context_keys: List[str] = []
     if variable.source == variable.SYSTEM:
         try:
