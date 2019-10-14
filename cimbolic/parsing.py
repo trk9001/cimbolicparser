@@ -232,10 +232,8 @@ class Condition(ContextMixin):
 class Rule(ContextMixin):
     """Encapsulation of an arithmetic rule object."""
     def __init__(self, rule: str, context: Optional[StrMapping] = None):
-        self.rule: str = rule
-        _named_variable.setParseAction(self.get_named_variable_parse_action())
-        self.cache: Dict[str, Numeric] = {}
         super().__init__(context)
+        self.rule: str = rule
 
     def evaluate(self) -> Numeric:
         """Parse self.rule and return a corresponding value."""
@@ -243,5 +241,4 @@ class Rule(ContextMixin):
         parse_results = _arithmetic_expression.parseString(self.rule)
         _named_variable.setParseAction(None)
         result: Numeric = _evaluator(parse_results)
-        self.cache.clear()
         return result

@@ -132,7 +132,9 @@ class Variable(models.Model):
                 ) from exc
             return instance
 
+    @property
     def context_keys(self) -> List[str]:
+        """Return a list of required context keys for this variable."""
         context_keys = get_all_context_keys(self)
         return context_keys
 
@@ -249,7 +251,7 @@ named_variable_regex = re.compile(r'\$([a-zA-Z_][a-zA-Z0-9_]*)')
 
 @lru_cache(maxsize=64)
 def get_all_context_keys(variable: Variable) -> List[str]:
-    """Get every dependency (variable or context key) for a particular rule."""
+    """Get every context key dependency for a particular variable."""
     context_keys: List[str] = []
     if variable.source == variable.SYSTEM:
         try:
