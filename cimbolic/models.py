@@ -1,7 +1,7 @@
 import re
 from decimal import Decimal
 from functools import lru_cache
-from typing import Any, Dict, Iterable, List, Optional, Union
+from typing import Any, Dict, List, Optional, Union
 
 from django.core.validators import MinValueValidator, RegexValidator
 from django.db import models
@@ -138,7 +138,14 @@ class Variable(models.Model):
         context_keys = get_all_context_keys(self)
         return context_keys
 
-    def prioritized_formulae(self) -> Union[Iterable, models.query.QuerySet]:
+    def add_formula(self, condition: str, rule: str, priority: int) -> 'Formula':
+        """Convenience method to easily create a related formula."""
+        formula = self.formulae.create(
+            condition=condition, rule=rule, priority=priority
+        )
+        return formula
+
+    def prioritized_formulae(self) -> models.query.QuerySet:
         """Return a queryset of the relevant formulae sorted by priority."""
         formulae = self.formulae.order_by('priority')
         return formulae
