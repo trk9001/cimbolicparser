@@ -249,7 +249,7 @@ named_variable_regex = re.compile(r'\$([a-zA-Z_][a-zA-Z0-9_]*)')
 
 @lru_cache(maxsize=64)
 def get_all_context_keys(variable: Variable) -> List[str]:
-    """Get every dependency (variable or context key) for a particular rule."""
+    """Get every context key dependency for a particular variable."""
     context_keys: List[str] = []
     if variable.source == variable.SYSTEM:
         try:
