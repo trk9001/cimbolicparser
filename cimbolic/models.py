@@ -132,7 +132,9 @@ class Variable(models.Model):
                 ) from exc
             return instance
 
+    @property
     def context_keys(self) -> List[str]:
+        """Return a list of required context keys for this variable."""
         context_keys = get_all_context_keys(self)
         return context_keys
 
