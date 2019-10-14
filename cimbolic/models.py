@@ -52,7 +52,9 @@ class Variable(models.Model):
     source = models.CharField(
         help_text='Whose action the variable originates from (eg: system, user)',
         choices=SOURCE_CHOICES,
+        default=USER,
         max_length=1,
+        blank=True,
     )
     related_data_type = models.CharField(
         help_text='The type of the data this variable is related to (eg: model, instance)',
@@ -77,6 +79,7 @@ class Variable(models.Model):
     is_active = models.BooleanField(
         help_text='Whether the variable is currently active',
         default=True,
+        blank=True,
     )
 
     def __str__(self):
