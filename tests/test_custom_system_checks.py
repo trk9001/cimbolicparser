@@ -11,12 +11,14 @@ from cimbolic.checks import check_for_system_variables_file
 @pytest.fixture
 def remove_file_temporarily():
     """Temporarily remove the check's referenced file for testing."""
+    # Setup
     cimbolic_vars_py = Path(settings.BASE_DIR) / SYSTEM_VARIABLES_FILE
     renamed_file = Path(settings.BASE_DIR) / f'{SYSTEM_VARIABLES_FILE}.tmp'
     cimbolic_vars_py.rename(renamed_file)
 
     yield None
 
+    # Teardown
     renamed_file.rename(cimbolic_vars_py)
 
 
