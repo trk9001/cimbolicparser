@@ -34,7 +34,7 @@ def test_real_number():
 
 
 def test_named_variable_without_parse_action():
-    named_variable = parsing._named_variable
+    named_variable: pp.ParserElement = parsing._named_variable
     test_cases = {
         '$FOO': 'FOO',
         '$foo': 'foo',
