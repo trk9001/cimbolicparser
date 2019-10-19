@@ -147,7 +147,7 @@ _arithmetic_expression <<= (
 _allowed_chars_in_string = list(pp.printables)
 _allowed_chars_in_string.remove('"')
 _allowed_chars_in_string.append(' ')
-_quoted_string = pp.Combine('"' + pp.Word(''.join(_allowed_chars_in_string)) + '"')
+_quoted_string = pp.Combine('"' + pp.Optional(pp.Word(''.join(_allowed_chars_in_string))) + '"')
 # ---
 
 # Conditional operator grammar ------------------------------------------------
