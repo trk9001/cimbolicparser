@@ -65,6 +65,7 @@ _named_variable = pp.Combine(
     pp.Suppress('$')
     + pp.Word(pp.alphas + '_', exact=1)
     + pp.Optional(pp.Word(pp.alphanums + '_'))
+    + pp.WordEnd()
 )
 # See the ContextMixin class for a ParseAction to set dynamically.
 # ---
