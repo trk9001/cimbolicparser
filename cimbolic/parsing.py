@@ -89,7 +89,10 @@ _aggregate_macro = (
 
 
 def _aggregate_macro_evaluator(toks: Tokens) -> Numeric:
-    """Recursively evaluate the arguments to an aggregate macro."""
+    """Recursively evaluate the arguments to an aggregate macro.
+
+    Note: Named variables are already parsed before entering this function.
+    """
     macro_name, macro_args = tuple(toks)
     sub_expression = ''
     parsed_args = []
