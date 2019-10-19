@@ -60,6 +60,7 @@ _real_number.setParseAction(lambda toks: Decimal(toks[0]) if '.' in toks[0] else
 # ---
 
 # Named variable grammar ------------------------------------------------------
+# TODO: After test coverage, rewrite to use the other args in pp.Word.__init__.
 _named_variable = pp.Combine(
     pp.Suppress('$')
     + pp.Word(pp.alphas + '_', exact=1)
@@ -137,6 +138,8 @@ _arithmetic_expression <<= (
 
 
 # Quoted string grammar -------------------------------------------------------
+# TODO: After test coverage, rewrite to use the excludeChars arg.
+#   See: https://pyparsing-docs.readthedocs.io/en/latest/HowToUsePyparsing.html#word
 _allowed_chars_in_string = list(pp.printables)
 _allowed_chars_in_string.remove('"')
 _allowed_chars_in_string.append(' ')
