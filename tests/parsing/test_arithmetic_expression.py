@@ -1,15 +1,12 @@
 from decimal import Decimal
 
-import pyparsing as pp
-import pytest
-
-from .util import parse
+from .util import ParsingElementTester
 from cimbolic import parsing
 
 
 def test_real_number():
-    real_number: pp.ParserElement = parsing._real_number
-    test_cases = {
+    tester = ParsingElementTester('real_number', parsing._real_number)
+    tester.legal_test_cases = {
         '0': 0,
         '1': 1,
         '10': 10,
@@ -29,13 +26,21 @@ def test_real_number():
         '-.1': Decimal('-0.1'),
         '-.10': Decimal('-0.10'),
     }
-    for test in test_cases:
-        assert parse(real_number, test) == test_cases[test]
+    tester.illegal_test_cases = [
+        'F',
+        '0F',
+        'F0',
+        '.',
+        '0..1',
+        '.1.',
+        '..1',
+    ]
+    tester.test_all()
 
 
 def test_named_variable_without_parse_action():
-    named_variable: pp.ParserElement = parsing._named_variable
-    test_cases = {
+    tester = ParsingElementTester('named_variable', parsing._named_variable)
+    tester.legal_test_cases = {
         '$FOO': 'FOO',
         '$foo': 'foo',
         '$Foo': 'Foo',
@@ -47,16 +52,13 @@ def test_named_variable_without_parse_action():
         '$X': 'X',
         '$_': '_',
     }
-    for test in test_cases:
-        assert parse(named_variable, test) == test_cases[test]
-    erroneous_cases = [
+    tester.illegal_test_cases = [
         'FOO',
         '$$FOO',
         '$1FOO',
         '$FOO$',
         '$FOO@',
         '$FOO+',
+        '$1',
     ]
-    for test in erroneous_cases:
-        with pytest.raises(pp.ParseException):
-            parse(named_variable, test)
+    tester.test_all()
