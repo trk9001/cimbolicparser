@@ -33,7 +33,7 @@ Tokens = pp.ParseResults
 # -------------------------------------------------------
 
 
-def _evaluator(tokens: Union[str, Tokens]) -> Union[bool, Numeric]:
+def evaluator(tokens: Union[str, Tokens]) -> Union[bool, Numeric]:
     """Evaluate a string or a ParseResult containing a reduced expression."""
     if not isinstance(tokens, str):
         tokens = ' '.join([str(tok) for tok in tokens])
@@ -41,7 +41,7 @@ def _evaluator(tokens: Union[str, Tokens]) -> Union[bool, Numeric]:
     return result
 
 
-def _print_tokens(tokens: Tokens) -> Tokens:
+def print_tokens(tokens: Tokens) -> Tokens:
     """Callable ParseAction to print tokens for debugging purposes."""
     from pprint import pprint
     pprint(tokens.asList())
@@ -53,15 +53,15 @@ def _print_tokens(tokens: Tokens) -> Tokens:
 
 
 # Real number grammar ---------------------------------------------------------
-_real_number_type_1 = pp.Combine(pp.Word(pp.nums) + pp.Optional('.' + pp.Word(pp.nums)))
-_real_number_type_2 = pp.Combine(pp.Optional(pp.Word(pp.nums)) + '.' + pp.Word(pp.nums))
-_real_number = pp.Combine(pp.Optional(pp.oneOf('+ -')) + (_real_number_type_1 | _real_number_type_2))
-_real_number.setParseAction(lambda toks: Decimal(toks[0]) if '.' in toks[0] else int(toks[0]))
+real_number_type_1 = pp.Combine(pp.Word(pp.nums) + pp.Optional('.' + pp.Word(pp.nums)))
+real_number_type_2 = pp.Combine(pp.Optional(pp.Word(pp.nums)) + '.' + pp.Word(pp.nums))
+real_number = pp.Combine(pp.Optional(pp.oneOf('+ -')) + (real_number_type_1 | real_number_type_2))
+real_number.setParseAction(lambda toks: Decimal(toks[0]) if '.' in toks[0] else int(toks[0]))
 # ---
 
 # Named variable grammar ------------------------------------------------------
 # TODO: After test coverage, rewrite to use the other args in pp.Word.__init__.
-_named_variable = pp.Combine(
+named_variable = pp.Combine(
     pp.Suppress('$')
     + pp.Word(pp.alphas + '_', exact=1)
     + pp.Optional(pp.Word(pp.alphanums + '_'))
@@ -71,24 +71,24 @@ _named_variable = pp.Combine(
 # ---
 
 # Arithmetic operator grammar -------------------------------------------------
-_multiplicative_arithmetic_operator = pp.oneOf('^ * / %')
-_additive_arithmetic_operator = pp.oneOf('+ -')
+multiplicative_arithmetic_operator = pp.oneOf('^ * / %')
+additive_arithmetic_operator = pp.oneOf('+ -')
 # ---
 
 # Arithmetic expression grammar (forward-declared) ----------------------------
-_arithmetic_expression = pp.Forward()
+arithmetic_expression = pp.Forward()
 # ---
 
 # Aggregate macro grammar -----------------------------------------------------
-_aggregate_macro_name = pp.oneOf('max min', caseless=True)
-_aggregate_macro = (
-    pp.Combine(_aggregate_macro_name + pp.Suppress('('))
-    + pp.Group(_arithmetic_expression + pp.ZeroOrMore(pp.Literal(',') + _arithmetic_expression))
+aggregate_macro_name = pp.oneOf('max min', caseless=True)
+aggregate_macro = (
+    pp.Combine(aggregate_macro_name + pp.Suppress('('))
+    + pp.Group(arithmetic_expression + pp.ZeroOrMore(pp.Literal(',') + arithmetic_expression))
     + pp.Suppress(')')
 )
 
 
-def _aggregate_macro_evaluator(toks: Tokens) -> Numeric:
+def aggregate_macro_evaluator(toks: Tokens) -> Numeric:
     """Recursively evaluate the arguments to an aggregate macro.
 
     Note: Named variables are already parsed before entering this function.
@@ -100,39 +100,41 @@ def _aggregate_macro_evaluator(toks: Tokens) -> Numeric:
         if arg != ',':
             sub_expression += str(arg)
         else:
-            parsed_args.append(_evaluator(sub_expression))
+            parsed_args.append(evaluator(sub_expression))
             sub_expression = ''
-    parsed_args.append(_evaluator(sub_expression))
-    result = _evaluator(f'{macro_name}({str(parsed_args)})')
+    parsed_args.append(evaluator(sub_expression))
+    result = evaluator(f'{macro_name}({str(parsed_args)})')
     return result
 
 
-_aggregate_macro.setParseAction(_aggregate_macro_evaluator)
+aggregate_macro.setParseAction(aggregate_macro_evaluator)
 # ---
 
 # Arithmetic term grammar -----------------------------------------------------
-_arithmetic_term = (
-    (_real_number | _named_variable | _aggregate_macro | _arithmetic_expression)
+arithmetic_term = (
+    (real_number | named_variable | aggregate_macro | arithmetic_expression)
     + pp.ZeroOrMore(
-        _multiplicative_arithmetic_operator
-        + (_real_number
-           | _named_variable
-           | _aggregate_macro
-           | _arithmetic_expression)
+        multiplicative_arithmetic_operator
+        + (
+            real_number
+            | named_variable
+            | aggregate_macro
+            | arithmetic_expression
+        )
     )
 )
 # ---
 
 # Arithmetic expression grammar -----------------------------------------------
-_arithmetic_expression <<= (
+arithmetic_expression <<= (
         (
-            '(' + _arithmetic_term + pp.ZeroOrMore(_additive_arithmetic_operator + _arithmetic_term) + ')'
+            '(' + arithmetic_term + pp.ZeroOrMore(additive_arithmetic_operator + arithmetic_term) + ')'
             + pp.ZeroOrMore(
-                (_multiplicative_arithmetic_operator + _arithmetic_expression)
-                | (_additive_arithmetic_operator + _arithmetic_term)
+                (multiplicative_arithmetic_operator + arithmetic_expression)
+                | (additive_arithmetic_operator + arithmetic_term)
             )
         )
-        | (_arithmetic_term + pp.ZeroOrMore(_additive_arithmetic_operator + _arithmetic_term))
+        | (arithmetic_term + pp.ZeroOrMore(additive_arithmetic_operator + arithmetic_term))
 )
 # ---
 
@@ -144,48 +146,48 @@ _arithmetic_expression <<= (
 # Quoted string grammar -------------------------------------------------------
 # TODO: After test coverage, rewrite to use the excludeChars arg.
 #   See: https://pyparsing-docs.readthedocs.io/en/latest/HowToUsePyparsing.html#word
-_allowed_chars_in_string = list(pp.printables)
-_allowed_chars_in_string.remove('"')
-_allowed_chars_in_string.append(' ')
-_quoted_string = pp.Combine('"' + pp.Optional(pp.Word(''.join(_allowed_chars_in_string))) + '"')
+allowed_chars_in_string = list(pp.printables)
+allowed_chars_in_string.remove('"')
+allowed_chars_in_string.append(' ')
+quoted_string = pp.Combine('"' + pp.Optional(pp.Word(''.join(allowed_chars_in_string))) + '"')
 # ---
 
 # Conditional operator grammar ------------------------------------------------
-_conditional_operator_equality = pp.oneOf('== !=')
-_conditional_operator_inequality = pp.oneOf('< > <= >=')
-_conditional_operator_all = _conditional_operator_equality | _conditional_operator_inequality
+conditional_operator_equality = pp.oneOf('== !=')
+conditional_operator_inequality = pp.oneOf('< > <= >=')
+conditional_operator_all = conditional_operator_equality | conditional_operator_inequality
 # ---
 
 # Logical operator grammar ----------------------------------------------------
-_logical_combination_operator = pp.CaselessKeyword('and') | pp.CaselessKeyword('or')
-_logical_negation_operator = pp.CaselessKeyword('not')
+logical_combination_operator = pp.CaselessKeyword('and') | pp.CaselessKeyword('or')
+logical_negation_operator = pp.CaselessKeyword('not')
 # ---
 
 # Boolean and null value grammar ----------------------------------------------
-_boolean_value = (
+boolean_value = (
     pp.oneOf('true false', caseless=True)
     .setParseAction(lambda toks: True if toks[0].upper() == 'TRUE' else False)
 )
-_null = pp.CaselessLiteral('null').setParseAction(lambda toks: None)
+null = pp.CaselessLiteral('null').setParseAction(lambda toks: None)
 # ---
 
 # Conditional expression grammar ----------------------------------------------
-_conditional_term = _arithmetic_expression.copy()
+conditional_term = arithmetic_expression.copy()
 
-_condition = (
-    ('(' + _conditional_term + _conditional_operator_equality + (_quoted_string | _boolean_value | _null) + ')')
-    | ('(' + _conditional_term + _conditional_operator_all + _conditional_term + ')')
-    | (_conditional_term + _conditional_operator_equality + (_quoted_string | _boolean_value | _null))
-    | (_conditional_term + _conditional_operator_all + _conditional_term)
+simple_condition = (
+    ('(' + conditional_term + conditional_operator_equality + (quoted_string | boolean_value | null) + ')')
+    | ('(' + conditional_term + conditional_operator_all + conditional_term + ')')
+    | (conditional_term + conditional_operator_equality + (quoted_string | boolean_value | null))
+    | (conditional_term + conditional_operator_all + conditional_term)
 )
 
-_conditional_expression = pp.Forward()
-_conditional_expression <<= (
-    ('(' + _logical_negation_operator + _conditional_expression + ')')
-    | ('(' + _conditional_expression + ')')
-    | (_logical_negation_operator + _conditional_expression)
-    | (_condition + pp.ZeroOrMore(_logical_combination_operator + _conditional_expression))
-) + pp.ZeroOrMore(_logical_combination_operator + _conditional_expression)
+conditional_expression = pp.Forward()
+conditional_expression <<= (
+    ('(' + logical_negation_operator + conditional_expression + ')')
+    | ('(' + conditional_expression + ')')
+    | (logical_negation_operator + conditional_expression)
+    | (simple_condition + pp.ZeroOrMore(logical_combination_operator + conditional_expression))
+) + pp.ZeroOrMore(logical_combination_operator + conditional_expression)
 # ---
 
 
@@ -229,10 +231,10 @@ class Condition(ContextMixin):
         if self.condition.strip().upper() == 'NULL':
             return True
         else:
-            _named_variable.setParseAction(self.get_named_variable_parse_action())
-            parse_results = _conditional_expression.parseString(self.condition)
-            _named_variable.setParseAction(None)
-            result: bool = _evaluator(parse_results)
+            named_variable.setParseAction(self.get_named_variable_parse_action())
+            parse_results = conditional_expression.parseString(self.condition)
+            named_variable.setParseAction(None)
+            result: bool = evaluator(parse_results)
             return result
 
 
@@ -244,8 +246,8 @@ class Rule(ContextMixin):
 
     def evaluate(self) -> Numeric:
         """Parse self.rule and return a corresponding value."""
-        _named_variable.setParseAction(self.get_named_variable_parse_action())
-        parse_results = _arithmetic_expression.parseString(self.rule)
-        _named_variable.setParseAction(None)
-        result: Numeric = _evaluator(parse_results)
+        named_variable.setParseAction(self.get_named_variable_parse_action())
+        parse_results = arithmetic_expression.parseString(self.rule)
+        named_variable.setParseAction(None)
+        result: Numeric = evaluator(parse_results)
         return result

@@ -5,7 +5,7 @@ from cimbolic import parsing
 
 
 def test_real_number():
-    tester = ParsingElementTester('real_number', parsing._real_number)
+    tester = ParsingElementTester('real_number', parsing.real_number)
     tester.legal_test_cases = {
         '0': 0,
         '1': 1,
@@ -39,7 +39,7 @@ def test_real_number():
 
 
 def test_named_variable_without_parse_action():
-    tester = ParsingElementTester('named_variable', parsing._named_variable)
+    tester = ParsingElementTester('named_variable', parsing.named_variable)
     tester.legal_test_cases = {
         '$FOO': 'FOO',
         '$foo': 'foo',

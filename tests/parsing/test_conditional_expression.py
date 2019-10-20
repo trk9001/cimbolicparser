@@ -5,7 +5,7 @@ from cimbolic import parsing
 def test_quoted_string():
     tester = ParsingElementTester(
         'quoted_string',
-        parsing._quoted_string,
+        parsing.quoted_string,
     )
     tester.legal_test_cases = {
         '""': '""',
