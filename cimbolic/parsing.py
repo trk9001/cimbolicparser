@@ -55,7 +55,7 @@ def print_tokens(tokens: Tokens) -> Tokens:
 # Real number grammar ---------------------------------------------------------
 real_number_type_1 = pp.Combine(pp.Word(pp.nums) + pp.Optional('.' + pp.Word(pp.nums)))
 real_number_type_2 = pp.Combine(pp.Optional(pp.Word(pp.nums)) + '.' + pp.Word(pp.nums))
-real_number = pp.Combine(pp.Optional(pp.oneOf('+ -')) + (real_number_type_1 | real_number_type_2))
+real_number = pp.Combine(pp.Optional(pp.oneOf('+ -')) + (real_number_type_1 | real_number_type_2) + pp.WordEnd())
 real_number.setParseAction(lambda toks: Decimal(toks[0]) if '.' in toks[0] else int(toks[0]))
 # ---
 
